@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction au C++</title>
+    <link rel="stylesheet" href="assets/css/cpp_intro.css">
+</head>
+<body>
+    <div class="presentation-container">
+        <a class="back-link" href="index.html">← Retour au menu</a>
+        <!-- Slide 1: Title -->
+        <div class="slide active title-slide">
+            <h1>Introduction au C++</h1>
+            <p class="subtitle">Découverte d'un langage puissant</p>
+            <p class="subtitle" style="margin-top: 40px; font-size: 1.1em;">Cours de Programmation - Licence 2</p>
+        </div>
+
+        <!-- Slide 2: Sommaire -->
+        <div class="slide">
+            <h2>Plan du Cours</h2>
+            <ul style="font-size: 1.2em; line-height: 2.2;">
+                <li>Qu'est-ce que le C++ ?</li>
+                <li>Histoire et évolution</li>
+                <li>Pourquoi le C++ existe-t-il ?</li>
+                <li>Les grands principes du C++</li>
+                <li>Procédurale vs Orientée Objet</li>
+                <li>Comparaison avec d'autres langages</li>
+                <li>Où est utilisé le C++ ?</li>
+                <li>Votre premier programme C++</li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: Qu'est-ce que le C++ -->
+        <div class="slide">
+            <h2>Qu'est-ce que le C++ ?</h2>
+            <div class="info-box">
+                <p style="font-size: 1.2em; font-weight: 600;">
+                    C++ est un langage de programmation créé pour écrire des programmes <strong>rapides</strong> et <strong>puissants</strong>.
+                </p>
+            </div>
+            <h3>Caractéristiques principales</h3>
+            <ul>
+                <li><strong>Langage compilé</strong> : votre code est traduit en langage machine avant l'exécution</li>
+                <li><strong>Performance</strong> : parmi les langages les plus rapides qui existent</li>
+                <li><strong>Contrôle</strong> : vous gérez directement la mémoire et les ressources</li>
+                <li><strong>Polyvalent</strong> : peut tout faire, des jeux vidéo aux systèmes d'exploitation</li>
+            </ul>
+        </div>
+
+        <!-- Slide 4: Histoire -->
+        <div class="slide">
+            <h2>Un Peu d'Histoire</h2>
+            <h3>La naissance du C++ (1979-1985)</h3>
+            <ul>
+                <li><span class="highlight">1979</span> : Bjarne Stroustrup travaille chez Bell Labs (USA)</li>
+                <li>Il veut améliorer le langage C en ajoutant des <strong>classes</strong></li>
+                <li>Nom initial : "C with Classes" (C avec des classes)</li>
+                <li><span class="highlight">1983</span> : Renommé <strong>C++</strong>
+                    <ul style="font-size: 0.95em;">
+                        <li>Le "++" signifie "incrémenter" en C → C amélioré !</li>
+                    </ul>
+                </li>
+            </ul>
+            <h3>Évolution</h3>
+            <ul>
+                <li><span class="highlight">1998</span> : Premier standard officiel (C++98)</li>
+                <li><span class="highlight">2011</span> : Grande révolution avec C++11 (C++ moderne)</li>
+                <li><span class="highlight">Aujourd'hui</span> : Nouvelles versions tous les 3 ans (C++14, 17, 20, 23...)</li>
+            </ul>
+        </div>
+
+        <!-- Slide 5: Pourquoi le C++ existe -->
+        <div class="slide">
+            <h2>Pourquoi le C++ a été créé ?</h2>
+            <h3>Le problème avec le C</h3>
+            <ul>
+                <li>Le langage C est <strong>puissant mais difficile</strong> pour les gros projets</li>
+                <li>Pas d'<strong>organisation</strong> du code (pas de classes)</li>
+                <li>Difficile de <strong>réutiliser</strong> le code</li>
+                <li>Gestion manuelle de tout → <strong>erreurs fréquentes</strong></li>
+            </ul>
+            <h3>La solution : C++</h3>
+            <ul>
+                <li>✅ Garde la <strong>vitesse et le contrôle</strong> du C</li>
+                <li>✅ Ajoute l'<strong>organisation</strong> avec les classes (Programmation Orientée Objet)</li>
+                <li>✅ Facilite la <strong>réutilisation</strong> du code (templates)</li>
+                <li>✅ Reste <strong>compatible</strong> avec le code C existant</li>
+            </ul>
+        </div>
+
+        <!-- Slide 6: Philosophie -->
+        <div class="slide">
+            <h2>La Philosophie du C++</h2>
+            <div class="info-box">
+                <p style="font-style: italic; font-size: 1.15em;">
+                    "C++ vous fait confiance. Il vous donne tous les outils, mais c'est à vous de les utiliser correctement."
+                </p>
+            </div>
+            <h3>Les grands principes</h3>
+            <ul>
+                <li><strong>Performance d'abord</strong> : aucune fonctionnalité ne doit ralentir le programme</li>
+                <li><strong>Liberté totale</strong> : vous pouvez faire ce que vous voulez (même des erreurs !)</li>
+                <li><strong>Pas de gaspillage</strong> : vous ne payez que pour ce que vous utilisez</li>
+                <li><strong>Expressivité</strong> : écrire du code qui ressemble à ce qu'on veut dire</li>
+            </ul>
+            <p style="margin-top: 30px; color: #d32f2f; font-weight: 600;">
+                ⚠️ Attention : Avec un grand pouvoir vient une grande responsabilité !
+            </p>
+        </div>
+
+        <!-- Slide 7: Ce que le C++ peut faire -->
+        <div class="slide">
+            <h2>Ce que le C++ Peut Faire</h2>
+            <h3>Programmation Procédurale (comme le C)</h3>
+            <p>Des fonctions qui s'appellent les unes les autres</p>
+            <h3>Programmation Orientée Objet (POO)</h3>
+            <p>Organiser le code avec des <strong>classes</strong> et des <strong>objets</strong></p>
+            <ul style="font-size: 0.95em;">
+                <li>Exemple : une classe <code>Voiture</code> avec des attributs (couleur, vitesse) et des méthodes (démarrer, freiner)</li>
+            </ul>
+            <h3>Programmation Générique</h3>
+            <p>Écrire du code qui fonctionne avec <strong>plusieurs types de données</strong></p>
+            <ul style="font-size: 0.95em;">
+                <li>Exemple : une fonction de tri qui marche pour des nombres, du texte, etc.</li>
+            </ul>
+        </div>
+
+        <!-- Nouvelle section: Procédurale vs POO (Comparaison) -->
+        <div class="slide">
+            <h2>Programmation procédurale vs orientée objet</h2>
+            <p>Deux façons complémentaires d’organiser un programme. La première se concentre sur les étapes à exécuter, la seconde sur les entités (objets) qui possèdent des données et des comportements.</p>
+            <div class="info-box">
+                <h3 style="margin-top:0;">Définitions rapides</h3>
+                <ul>
+                    <li><strong>Procédurale</strong> : on écrit des fonctions qui manipulent des données passées en paramètres. Idéale pour des scripts, outils, calculs linéaires.</li>
+                    <li><strong>POO</strong> : on regroupe données + fonctions dans des classes pour former des objets. Adaptée aux systèmes avec plusieurs entités qui interagissent.</li>
+                </ul>
+            </div>
+            <h3>Tableau de comparaison</h3>
+            <table class="comparison-table">
+                <tr>
+                    <th>Aspect</th>
+                    <th>Procédurale</th>
+                    <th>Orientée Objet</th>
+                </tr>
+                <tr>
+                    <td><strong>Organisation</strong></td>
+                    <td>Fonctions + données passées en paramètres</td>
+                    <td>Code regroupé en <strong>classes</strong> et <strong>objets</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Modélisation</strong></td>
+                    <td>Séquence d'étapes (algorithmes)</td>
+                    <td>Entités du domaine et leurs interactions</td>
+                </tr>
+                <tr>
+                    <td><strong>Données</strong></td>
+                    <td>Souvent exposées; peu d'encapsulation</td>
+                    <td>Encapsulation, invariants protégés</td>
+                </tr>
+                <tr>
+                    <td><strong>Réutilisation</strong></td>
+                    <td>Bibliothèques, fonctions</td>
+                    <td>Héritage, composition, polymorphisme</td>
+                </tr>
+                <tr>
+                    <td><strong>Couplage</strong></td>
+                    <td>Peut devenir fort (état global)</td>
+                    <td>Interfaces et abstractions pour limiter le couplage</td>
+                </tr>
+                <tr>
+                    <td><strong>Évolutivité</strong></td>
+                    <td>Gère bien les petits/moyens programmes</td>
+                    <td>Plus adaptée aux grands projets</td>
+                </tr>
+                <tr>
+                    <td><strong>Performance</strong></td>
+                    <td>Très proche de la machine</td>
+                    <td>Peut être aussi rapide si bien conçue</td>
+                </tr>
+                <tr>
+                    <td><strong>Exemples typiques</strong></td>
+                    <td>Scripts systèmes, calculs linéaires</td>
+                    <td>Jeux, GUI, systèmes complexes</td>
+                </tr>
+            </table>
+            <h3>Quand utiliser quoi ?</h3>
+            <ul>
+                <li><strong>Procédurale</strong> : petites applis linéaires, utilitaires, calculs, scripts, prototypes rapides.</li>
+                <li><strong>POO</strong> : projets moyens/grands, interfaces graphiques, jeux, simulateurs, modèles métier riches.</li>
+            </ul>
+            <div class="info-box">
+                <strong>À retenir :</strong> la POO facilite la lisibilité et l’évolutivité quand le domaine est riche. Sinon, rester procédural est souvent plus simple et plus clair.
+            </div>
+        </div>
+
+        <!-- Nouvelle section: Exemple procédural vs POO -->
+        <div class="slide">
+            <h2>Exemple comparatif (procédural vs POO)</h2>
+            <h3>Approche procédurale</h3>
+            <div class="code-example">
+<pre>#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+struct Compte { std::string titulaire; double solde; };
+
+void deposer(Compte&amp; c, double m) { c.solde += m; }
+bool retirer(Compte&amp; c, double m) {
+    if (m &gt; c.solde) return false; // pas assez
+    c.solde -= m; return true;
+}
+
+int main() {
+    Compte c{"Alice", 100.0};
+    deposer(c, 50);
+    if (!retirer(c, 200)) std::cout &lt;&lt; "Fonds insuffisants\n";
+    std::cout &lt;&lt; c.titulaire &lt;&lt; ": " &lt;&lt; c.solde &lt;&lt; "\n";
+}</pre>
+            </div>
+            <h3>Approche orientée objet</h3>
+            <div class="code-example">
+<pre>#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+class Compte {
+    std::string titulaire_;
+    double solde_{};
+public:
+    Compte(std::string t, double s) : titulaire_(std::move(t)), solde_(s) {}
+    void deposer(double m) { solde_ += m; }
+    bool retirer(double m) {
+        if (m &gt; solde_) return false; // invariant protégé
+        solde_ -= m; return true;
+    }
+    double solde() const { return solde_; }
+    const std::string&amp; titulaire() const { return titulaire_; }
+};
+
+int main() {
+    Compte c{"Alice", 100.0};
+    c.deposer(50);
+    if (!c.retirer(200)) std::cout &lt;&lt; "Fonds insuffisants\n";
+    std::cout &lt;&lt; c.titulaire() &lt;&lt; ": " &lt;&lt; c.solde() &lt;&lt; "\n";
+}</pre>
+            </div>
+            <div class="info-box">
+                <h3 style="margin-top:0;">Ce qu'il faut comprendre</h3>
+                <p>En POO, l'<strong>état</strong> (données) et les <strong>règles</strong> (méthodes, invariants) vivent ensemble dans la classe. On manipule l’objet via une <strong>interface publique</strong> claire, ce qui réduit les erreurs et le couplage.</p>
+            </div>
+            <h3>Pas à pas : procédural</h3>
+            <ul>
+                <li>Les fonctions <code>deposer</code> et <code>retirer</code> reçoivent la structure <code>Compte</code> et la modifient.</li>
+                <li>Le <strong>contrôle</strong> (solde suffisant) est dissocié des données et doit être répété partout.</li>
+                <li>Le risque d’erreur augmente si quelqu’un modifie <code>solde</code> sans passer par les bonnes fonctions.</li>
+            </ul>
+            <h3>Pas à pas : POO</h3>
+            <ul>
+                <li>La classe <code>Compte</code> <strong>encapsule</strong> les données et expose des méthodes (<code>deposer</code>, <code>retirer</code>).</li>
+                <li>Les <strong>invariants</strong> (ex. ne pas aller sous zéro) sont vérifiés <em>dans</em> la classe.</li>
+                <li>Le code appelant est plus lisible : <code>c.deposer(…)</code> dit ce qu’on fait à l’objet.</li>
+            </ul>
+            <div class="info-box">
+                <strong>Vocabulaire utile :</strong>
+                <ul>
+                    <li><strong>Encapsulation</strong> : cacher l’implémentation et protéger les règles internes.</li>
+                    <li><strong>Abstraction</strong> : ne montrer que ce qui est nécessaire pour utiliser l’objet.</li>
+                    <li><strong>Composition</strong> : construire des objets à partir d’autres objets (souvent préférable à l’héritage).</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 8: Votre premier programme -->
+        <div class="slide">
+            <h2>Votre Premier Programme C++</h2>
+            <div class="code-example">
+<pre>#include &lt;iostream&gt;
+
+int main() {
+    std::cout &lt;&lt; "Bonjour le monde !" &lt;&lt; std::endl;
+    return 0;
+}</pre>
+            </div>
+            <h3>Explication ligne par ligne</h3>
+            <ul>
+                <li><code style="background:#f0f0f0;padding:2px 6px;">#include &lt;iostream&gt;</code> : inclut la bibliothèque pour afficher du texte</li>
+                <li><code style="background:#f0f0f0;padding:2px 6px;">int main()</code> : fonction principale, point d'entrée du programme</li>
+                <li><code style="background:#f0f0f0;padding:2px 6px;">std::cout</code> : affiche du texte à l'écran</li>
+                <li><code style="background:#f0f0f0;padding:2px 6px;">return 0</code> : le programme s'est bien terminé</li>
+            </ul>
+        </div>
+
+        <!-- Slide 9: Comparaison simple -->
+        <div class="slide">
+            <h2>C++ vs Autres Langages (Vue Simple)</h2>
+            <table class="comparison-table">
+                <tr>
+                    <th>Langage</th>
+                    <th>Vitesse</th>
+                    <th>Difficulté</th>
+                    <th>Usage principal</th>
+                </tr>
+                <tr>
+                    <td><strong>C++</strong></td>
+                    <td>⚡⚡⚡ Très rapide</td>
+                    <td>🔴 Difficile</td>
+                    <td>Jeux, Systèmes</td>
+                </tr>
+                <tr>
+                    <td><strong>Python</strong></td>
+                    <td>🐌 Lent</td>
+                    <td>🟢 Facile</td>
+                    <td>Scripts, IA, Web</td>
+                </tr>
+                <tr>
+                    <td><strong>Java</strong></td>
+                    <td>⚡ Moyen</td>
+                    <td>🟡 Moyen</td>
+                    <td>Applications, Web</td>
+                </tr>
+                <tr>
+                    <td><strong>C</strong></td>
+                    <td>⚡⚡⚡ Très rapide</td>
+                    <td>🔴 Très difficile</td>
+                    <td>Systèmes embarqués</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Slide 10: Différences C vs C++ -->
+        <div class="slide">
+            <h2>C++ vs C : Quelle Différence ?</h2>
+            <h3>Le C++ ajoute au C :</h3>
+            <ul>
+                <li><strong>Les classes et objets</strong> (POO) → meilleure organisation du code</li>
+                <li><strong>Les templates</strong> → code réutilisable</li>
+                <li><strong>La STL</strong> (Standard Template Library) → plein d'outils prêts (vector, map...)</li>
+                <li><strong>Les exceptions</strong> → meilleure gestion des erreurs</li>
+                <li><strong>Les références</strong> → alternative plus sûre aux pointeurs</li>
+                <li><strong>Les namespaces</strong> → éviter les conflits de noms</li>
+            </ul>
+            <div class="info-box" style="margin-top: 30px;">
+                <strong>Important :</strong> C++ peut utiliser du code C, mais pas l'inverse !
+            </div>
+        </div>
+
+        <!-- Slide 11: Avantages et Inconvénients -->
+        <div class="slide">
+            <h2>Avantages et Inconvénients</h2>
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✅ Avantages</h4>
+                    <ul style="font-size: 0.95em; margin-left: 20px;">
+                        <li><strong>Très rapide</strong> : parmi les plus performants</li>
+                        <li><strong>Contrôle total</strong> : mémoire, ressources</li>
+                        <li><strong>Polyvalent</strong> : peut tout faire</li>
+                        <li><strong>Largement utilisé</strong> : dans l'industrie</li>
+                        <li><strong>Beaucoup d'outils</strong> : bibliothèques disponibles</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>❌ Inconvénients</h4>
+                    <ul style="font-size: 0.95em; margin-left: 20px;">
+                        <li><strong>Complexe</strong> : beaucoup de concepts</li>
+                        <li><strong>Erreurs difficiles</strong> : bugs mémoire</li>
+                        <li><strong>Compilation longue</strong> : pour gros projets</li>
+                        <li><strong>Courbe d'apprentissage</strong> : prend du temps</li>
+                        <li><strong>Gestion manuelle</strong> : plus de travail</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Où est utilisé C++ -->
+        <div class="slide">
+            <h2>Où le C++ est Utilisé ?</h2>
+            <h3>Domaines d'application</h3>
+            <ul>
+                <li><strong>🎮 Jeux vidéo</strong> : Unreal Engine, Unity (partie moteur), la plupart des AAA</li>
+                <li><strong>💻 Systèmes d'exploitation</strong> : Windows, Linux, macOS (parties importantes)</li>
+                <li><strong>🌐 Navigateurs web</strong> : Chrome, Firefox (moteurs de rendu)</li>
+                <li><strong>📱 Applications mobiles</strong> : parties critiques Android/iOS</li>
+                <li><strong>🚗 Automobile</strong> : systèmes embarqués, conduite autonome</li>
+                <li><strong>💰 Finance</strong> : trading haute fréquence</li>
+                <li><strong>🤖 Intelligence Artificielle</strong> : TensorFlow, PyTorch (cœur en C++)</li>
+                <li><strong>🎨 Logiciels graphiques</strong> : Photoshop, Maya, Blender</li>
+            </ul>
+        </div>
+
+        <!-- Slide 13: Compilation -->
+        <div class="slide">
+            <h2>Comment Fonctionne un Programme C++ ?</h2>
+            <h3>Le processus de compilation</h3>
+            <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p style="text-align: center; font-size: 1.2em; line-height: 2;">
+                    <strong>Code source (.cpp)</strong><br>
+                    ⬇️ Compilation<br>
+                    <strong>Code machine (exécutable)</strong><br>
+                    ⬇️ Exécution<br>
+                    <strong>Programme qui tourne</strong>
+                </p>
+            </div>
+            <h3>Compilateurs populaires</h3>
+            <ul>
+                <li><strong>GCC</strong> : gratuit, utilisé sur Linux</li>
+                <li><strong>Clang</strong> : moderne, messages d'erreur clairs</li>
+                <li><strong>MSVC</strong> : Microsoft, pour Windows</li>
+            </ul>
+        </div>
+
+        <!-- Slide 14: Outils nécessaires -->
+        <div class="slide">
+            <h2>De Quoi Avez-vous Besoin ?</h2>
+            <h3>Pour programmer en C++</h3>
+            <ul>
+                <li><strong>Un compilateur</strong> : transforme votre code en programme
+                    <ul style="font-size: 0.95em;">
+                        <li>GCC, Clang, ou MSVC</li>
+                    </ul>
+                </li>
+                <li><strong>Un éditeur de texte ou IDE</strong> : pour écrire votre code
+                    <ul style="font-size: 0.95em;">
+                        <li>Visual Studio, Visual Studio Code, CLion, Code::Blocks</li>
+                    </ul>
+                </li>
+                <li><strong>Un système de build</strong> (optionnel pour débuter)
+                    <ul style="font-size: 0.95em;">
+                        <li>CMake, Make</li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="info-box" style="margin-top: 30px;">
+                <strong>Conseil :</strong> Commencez simple avec un IDE tout-en-un comme Code::Blocks ou Visual Studio Code !
+            </div>
+        </div>
+
+        <!-- Slide 15: Pourquoi apprendre -->
+        <div class="slide">
+            <h2>Pourquoi Apprendre le C++ ?</h2>
+            <ul style="font-size: 1.1em;">
+                <li><strong>📚 Comprendre l'informatique en profondeur</strong>
+                    <ul style="font-size: 0.9em;">
+                        <li>Mémoire, pointeurs, compilation...</li>
+                    </ul>
+                </li>
+                <li><strong>💼 Opportunités professionnelles</strong>
+                    <ul style="font-size: 0.9em;">
+                        <li>Très demandé dans l'industrie (jeux, finance, systèmes...)</li>
+                    </ul>
+                </li>
+                <li><strong>🚀 Performance</strong>
+                    <ul style="font-size: 0.9em;">
+                        <li>Pour les applications qui doivent être rapides</li>
+                    </ul>
+                </li>
+                <li><strong>🧠 Base solide</strong>
+                    <ul style="font-size: 0.9em;">
+                        <li>Facilite l'apprentissage d'autres langages ensuite</li>
+                    </ul>
+                </li>
+                <li><strong>🎮 Créer des choses impressionnantes</strong>
+                    <ul style="font-size: 0.9em;">
+                        <li>Jeux, simulations, applications graphiques...</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 16: Conseils pour débuter -->
+        <div class="slide">
+            <h2>Conseils pour Bien Débuter</h2>
+            <div class="info-box">
+                <h3 style="margin-top: 0;">🎯 Les clés du succès</h3>
+                <ul>
+                    <li><strong>Pratiquez régulièrement</strong> : codez un peu chaque jour plutôt que beaucoup d'un coup</li>
+                    <li><strong>Commencez simple</strong> : maîtrisez les bases avant d'aller plus loin</li>
+                    <li><strong>Faites des erreurs</strong> : c'est en se trompant qu'on apprend</li>
+                    <li><strong>Lisez les messages d'erreur</strong> : ils vous aident à comprendre le problème</li>
+                    <li><strong>Ne comparez pas</strong> : chacun avance à son rythme</li>
+                </ul>
+            </div>
+            <p style="text-align: center; margin-top: 30px; font-size: 1.3em; color: #667eea; font-weight: 600;">
+                La patience et la pratique sont vos meilleurs alliés ! 💪
+            </p>
+        </div>
+
+        <!-- Slide 17: Ressources -->
+        <div class="slide">
+            <h2>Ressources pour Apprendre</h2>
+            <h3>📚 Sites Web Recommandés</h3>
+            <ul>
+                <li><strong>learncpp.com</strong> : tutoriels progressifs pour débutants</li>
+                <li><strong>cppreference.com</strong> : documentation de référence</li>
+                <li><strong>cplusplus.com</strong> : tutoriels et documentation</li>
+            </ul>
+            <h3>💻 Pratique en Ligne</h3>
+            <ul>
+                <li><strong>HackerRank, LeetCode</strong> : exercices de programmation</li>
+                <li><strong>Codewars</strong> : défis progressifs</li>
+            </ul>
+            <h3>📖 Livres (niveau débutant)</h3>
+            <ul>
+                <li>"C++ Primer" - Stanley Lippman</li>
+                <li>"Programming: Principles and Practice Using C++" - Bjarne Stroustrup</li>
+            </ul>
+        </div>
+
+        <!-- Slide 18: Conclusion -->
+        <div class="slide">
+            <h2>En Résumé</h2>
+            <div class="info-box" style="font-size: 1.1em;">
+                <ul>
+                    <li>✅ C++ est un langage <strong>puissant et rapide</strong></li>
+                    <li>✅ Créé pour améliorer le C avec la POO</li>
+                    <li>✅ Utilisé dans les <strong>jeux, systèmes, IA...</strong></li>
+                    <li>✅ Difficile mais <strong>très formateur</strong></li>
+                    <li>✅ Vous donne le <strong>contrôle total</strong> sur la machine</li>
+                    <li>✅ Base solide pour <strong>toute votre carrière</strong></li>
+                </ul>
+            </div>
+            <p style="text-align: center; margin-top: 40px; font-size: 1.4em; color: #667eea; font-weight: 600;">
+                Prêts à coder en C++ ? 🚀
+            </p>
+            <p style="text-align: center; margin-top: 20px; font-size: 1.2em;">
+                <strong>Questions ?</strong>
+            </p>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+            <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">18</span></span>
+            <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+        </div>
+    </div>
+
+    <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

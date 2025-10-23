@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 0 — Installer C++ (macOS & Windows)</title>
+    <link rel="stylesheet" href="assets/css/cpp_intro.css">
+</head>
+<body>
+    <div class="presentation-container">
+        <a class="back-link" href="index.html">← Retour au menu</a>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active title-slide">
+            <h1>Chapitre 0 — Installer C++</h1>
+            <p class="subtitle">macOS et Windows • Licence 2</p>
+        </div>
+
+        <!-- Slide 2: Plan -->
+        <div class="slide">
+            <h2>Plan</h2>
+            <ul style="font-size: 1.2em; line-height: 2.1;">
+                <li>Installer C++ sur macOS (clang++ ou g++ via Homebrew)</li>
+                <li>Installer C++ sur Windows (MSVC, MinGW)</li>
+                <li>Code::Blocks (Windows)</li>
+                <li>VS Code (éditeur conseillé)</li>
+                <li>Test rapide: Hello World</li>
+                <li>Dépannage courant</li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: macOS - Xcode CLT -->
+        <div class="slide">
+            <h2>macOS — Xcode Command Line Tools</h2>
+            <div class="info-box">
+                <p>La méthode la plus simple sur macOS. Installe <strong>clang++</strong> (compatible C++ moderne).</p>
+            </div>
+            <h3>Étapes</h3>
+            <ul>
+                <li>Ouvrez <strong>Terminal</strong> (Spotlight → « Terminal »).</li>
+                <li>Lancez: <code class="code-example" style="display:inline-block; padding:6px 10px;">xcode-select --install</code></li>
+                <li>Acceptez la licence et attendez la fin.</li>
+            </ul>
+            <h3>Vérifier</h3>
+            <div class="code-example"><pre>clang++ --version
+# ou
+c++ --version</pre></div>
+            <div class="info-box">
+                <strong>Remarque :</strong> sur macOS, la commande <code>g++</code> pointe souvent vers <code>clang++</code>.
+            </div>
+        </div>
+
+        <!-- Slide 4: macOS — Homebrew (optionnel) -->
+        <div class="slide">
+            <h2>macOS — Homebrew (optionnel)</h2>
+            <p>Utile si vous voulez une version spécifique de <strong>GCC</strong> ou de <strong>LLVM</strong>.</p>
+            <h3>Étapes</h3>
+            <ul>
+                <li>Installez Homebrew: <a href="https://brew.sh" target="_blank" rel="noreferrer">brew.sh</a></li>
+                <li>Installez LLVM (clang++ récent): <code class="code-example" style="display:inline-block; padding:6px 10px;">brew install llvm</code></li>
+                <li>Optionnel: ajouter au PATH (Apple Silicon): <code class="code-example" style="display:inline-block; padding:6px 10px;">echo 'export PATH="/opt/homebrew/opt/llvm/bin:$PATH"' &gt;&gt; ~/.zshrc</code></li>
+            </ul>
+            <div class="info-box">
+                <strong>Alternative :</strong> <code>brew install gcc</code> fournit <code>g++-14</code> (numéro selon la version).
+            </div>
+        </div>
+
+        
+
+        <!-- Slide 5: Windows — Visual Studio -->
+        <div class="slide">
+            <h2>Windows — Visual Studio (gratuit)</h2>
+            <div class="info-box">
+                <p>Installe le compilateur <strong>MSVC</strong> et tous les outils nécessaires.</p>
+            </div>
+            <h3>Étapes</h3>
+            <ul>
+                <li>Téléchargez <strong>Visual Studio Community</strong> (ou <strong>Build Tools</strong>).</li>
+                <li>Choisissez la charge de travail: <strong>Développement Desktop en C++</strong>.</li>
+                <li>Ouvrez <em>Developer Command Prompt for VS</em>.</li>
+            </ul>
+            <h3>Vérifier</h3>
+            <div class="code-example"><pre>cl</pre></div>
+            <div class="info-box">
+                <strong>Astuce :</strong> utilisez ce terminal spécial pour que <code>cl</code> soit disponible dans le PATH.
+            </div>
+        </div>
+
+        <!-- Slide 6: Windows — MSYS2 + MinGW -->
+        <div class="slide">
+            <h2>Windows — MSYS2 + MinGW</h2>
+            <p>Alternative légère pour <strong>g++</strong> (GNU). Recommandé si vous préférez GCC.</p>
+            <h3>Étapes</h3>
+            <ul>
+                <li>Téléchargez MSYS2 : <a href="https://www.msys2.org" target="_blank" rel="noreferrer">msys2.org</a></li>
+                <li>Ouvrez <strong>MSYS2 MSYS</strong> et mettez à jour : <code class="code-example" style="display:inline-block; padding:6px 10px;">pacman -Syu</code> (redémarrez si demandé)</li>
+                <li>Installez l’outilchain 64-bit : <code class="code-example" style="display:inline-block; padding:6px 10px;">pacman -S --needed base-devel mingw-w64-ucrt-x86_64-toolchain</code></li>
+                <li>Ouvrez le terminal <strong>MSYS2 MinGW UCRT64</strong>.</li>
+            </ul>
+            <h3>Vérifier</h3>
+            <div class="code-example"><pre>g++ --version</pre></div>
+        </div>
+
+        <!-- Slide 7: Windows — Code::Blocks (avec MinGW) -->
+        <div class="slide">
+            <h2>Windows — Code::Blocks (avec MinGW)</h2>
+            <p>Alternative « tout-en-un » qui installe <strong>Code::Blocks</strong> + <strong>MinGW</strong>.</p>
+            <h3>Étapes</h3>
+            <ul>
+                <li>Téléchargez l’installateur <em>avec MinGW</em> (ex&nbsp;: <code>codeblocks-20.03mingw-setup.exe</code>).</li>
+                <li>Installez en laissant les options par défaut.</li>
+                <li>Créez un projet « Console application » → C++ → Compilez et exécutez.</li>
+            </ul>
+            <h3>Vérifier</h3>
+            <div class="code-example"><pre>g++ --version
+where g++</pre></div>
+            <div class="info-box">
+                <strong>Conseil :</strong> si vous avez déjà MSYS2/MinGW, vous pouvez configurer Code::Blocks pour utiliser ce compilateur.
+            </div>
+        </div>
+
+        <!-- Slide 8: Windows — Visual Studio (gratuit) -->
+        
+        
+        <!-- Slide 8: VS Code -->
+        <div class="slide">
+            <h2>VS Code — Éditeur conseillé</h2>
+            <h3>Installation</h3>
+            <ul>
+                <li>Installez <strong>Visual Studio Code</strong>.</li>
+                <li>Ajoutez l’extension <strong>C/C++</strong> (Microsoft).</li>
+            </ul>
+            <h3>Compilation simple (Terminal intégré)</h3>
+            <ul>
+                <li>Ouvrez un dossier → créez <code>main.cpp</code>.</li>
+                <li>Terminal → exécutez :
+                    <div class="code-example"><pre>// macOS (clang++)
+clang++ main.cpp -std=c++17 -O2 -o main &amp;&amp; ./main
+
+// Windows (MSVC)
+cl /EHsc /std:c++17 main.cpp &amp;&amp; main.exe
+
+// Windows (MinGW)
+g++ main.cpp -std=c++17 -O2 -o main.exe &amp;&amp; ./main.exe</pre></div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 9: Test rapide -->
+        <div class="slide">
+            <h2>Test rapide — Hello World</h2>
+            <div class="code-example"><pre>#include &lt;iostream&gt;
+
+int main() {
+    std::cout &lt;&lt; "Bonjour C++!" &lt;&lt; std::endl;
+    return 0;
+}</pre></div>
+            <p>Compilez et lancez selon votre plateforme (voir diapo précédente).</p>
+            <div class="info-box">
+                <strong>Si cela affiche « Bonjour C++! »</strong> → tout est prêt pour le cours.
+            </div>
+        </div>
+
+        <!-- Slide 10: Dépannage -->
+        <div class="slide">
+            <h2>Dépannage</h2>
+            <ul>
+                <li><strong>commande introuvable</strong> : ouvrez le bon terminal (Developer Prompt VS, MSYS2 UCRT64, Terminal macOS).</li>
+                <li><strong>cl introuvable</strong> : lancez <em>Developer Command Prompt for VS</em>.</li>
+                <li><strong>g++ introuvable (Windows)</strong> : installez MSYS2 + toolchain, puis utilisez le terminal <em>MinGW UCRT64</em>.</li>
+                <li><strong>Permission refusée (macOS)</strong> : relancez l’installation <code>xcode-select --install</code>.</li>
+                <li><strong>VS Code ne trouve pas le compilateur</strong> : compilez via le terminal intégré plutôt que le bouton « Run ».</li>
+            </ul>
+        </div>
+
+        <!-- Slide 11: Suite -->
+        <div class="slide">
+            <h2>Prêt pour la suite</h2>
+            <ul>
+                <li>Votre environnement C++ est installé et testé.</li>
+                <li>Continuez avec <a href="cpp_intro_presentation.html">Chapitre 1 — Introduction au C++</a>.</li>
+                <li>Besoin d’aide ? Revenez à ce guide.</li>
+            </ul>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+            <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">11</span></span>
+            <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+        </div>
+    </div>
+
+    <script src="assets/js/cpp_intro.js"></script>
+</body>
+<!--
+  Notes rapides:
+  - Ce guide réutilise le même style (CSS/JS) que les autres chapitres.
+  - Les commandes MSYS2 utilisent l’environnement UCRT64 (recommandé, 64-bit).
+-->
+</html>

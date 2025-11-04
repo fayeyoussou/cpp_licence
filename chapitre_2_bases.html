@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 2 — Les bases du langage</title>
+    <link rel="stylesheet" href="assets/css/cpp_intro.css">
+</head>
+<body>
+    <div class="presentation-container">
+        <a class="back-link" href="index.html">← Retour au menu</a>
+
+        <!-- Slide 1: Titre -->
+        <div class="slide active title-slide">
+            <h1>Chapitre 2 — Les bases du langage</h1>
+            <p class="subtitle">Variables, types, opérateurs, contrôle, tableaux, chaînes</p>
+
+        </div>
+
+        <!-- Slide 2: Plan -->
+        <div class="slide">
+            <h2>Plan</h2>
+            <ul style="font-size: 1.05em; line-height: 1.9;">
+                <li>Les types de base: <code>int</code>, <code>float</code>, <code>double</code>, <code>char</code>, <code>bool</code></li>
+                <li>Constantes et variables (déclaration, initialisation)</li>
+                <li>Opérateurs: arithmétiques, logiques et relationnels</li>
+                <li>Conversions implicites et explicites (<em>cast</em>)</li>
+                <li>Structures de contrôle: <code>if</code>, <code>else if</code>, <code>switch</code>, <code>for</code>, <code>while</code>, <code>do...while</code></li>
+                <li>Instructions de saut: <code>break</code>, <code>continue</code>, <code>return</code></li>
+                <li>Tableaux et chaînes: déclaration, parcours, multidimensionnels, <code>char[]</code> vs <code>std::string</code></li>
+                <li>Exercices: calculatrice, échange, tables, nombre premier</li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: Types de base -->
+        <div class="slide">
+            <h2>Types de base</h2>
+            <ul>
+                <li><strong>int</strong>: entiers (ex: -3, 0, 42)</li>
+                <li><strong>float</strong>, <strong>double</strong>: nombres à virgule (double = plus précis)</li>
+                <li><strong>char</strong>: caractère (ex: <code>'A'</code>), stocke un code (ASCII/UTF-8)</li>
+                <li><strong>bool</strong>: logique, <code>true</code> ou <code>false</code></li>
+                <li>Signé/Non signé: <code>unsigned int</code> (≥ 0)</li>
+                <li>Tailles typiques: <code>int</code> 32 bits, <code>double</code> 64 bits (selon plateforme)</li>
+            </ul>
+            <div class="code-example"><pre>#include &lt;iostream&gt;
+int main() {
+    int entier = 42;
+    double reel = 3.14;    // préférez double à float au début
+    char lettre = 'A';
+    bool ok = true;
+    std::cout &lt;&lt; entier &lt;&lt; " " &lt;&lt; reel &lt;&lt; " " &lt;&lt; lettre &lt;&lt; " " &lt;&lt; ok &lt;&lt; "\n";
+}
+</pre></div>
+            <div class="info-box">
+                <strong>Important:</strong> les guillemets simples <code>'A'</code> pour un <code>char</code>, doubles <code>"ABC"</code> pour une chaîne de caractères.
+            </div>
+        </div>
+
+        <!-- Slide 4: Littéraux et notations -->
+        <div class="slide">
+            <h2>Littéraux et notations</h2>
+            <ul>
+                <li>Entiers: décimal <code>42</code>, hex <code>0x2A</code>, binaire <code>0b101010</code></li>
+                <li>Réels: <code>3.14</code>, suffixe <code>f</code> pour <code>float</code> (ex: <code>1.5f</code>)</li>
+                <li>Caractères: <code>'A'</code>, échappements <code>'\n'</code> (nouvelle ligne), <code>'\\'</code></li>
+                <li>Booléens: <code>true</code>, <code>false</code></li>
+            </ul>
+            <div class="code-example"><pre>int x = 42; unsigned u = 42u; double d = 1.0; float f = 1.0f;
+char nl = '\n'; char backslash = '\\';
+</pre></div>
+            <div class="info-box">
+                <strong>Astuce:</strong> utilisez les suffixes (<code>u</code>, <code>f</code>) quand nécessaire pour préciser le type.
+            </div>
+        </div>
+
+        <!-- Slide 5: Variables et constantes -->
+        <div class="slide">
+            <h2>Variables et constantes</h2>
+            <ul>
+                <li>Déclaration: <code>type nom;</code> (ex: <code>int age;</code>)</li>
+                <li>Initialisation: <code>=</code> (copie), <code>()</code> (directe), <code>{}</code> (uniforme)</li>
+                <li><strong>const</strong>: valeur qui ne change pas (ex: <code>const double PI = 3.14159;</code>)</li>
+                <li>Noms clairs: <code>surfaceTotale</code>, <code>noteFinale</code> (évitez <code>a1</code>, <code>x</code>)</li>
+            </ul>
+            <div class="code-example"><pre>#include &lt;iostream&gt;
+int main() {
+    int age = 20;          // déclaration + initialisation
+    const double TAUX = 1.2; // constante
+    int a = 1; int b(2); int c{3};
+    std::cout &lt;&lt; a+b+c &lt;&lt; " " &lt;&lt; TAUX;
+}
+</pre></div>
+            <div class="info-box">
+                <strong>Astuce débutant:</strong> initialisez vos variables dès la déclaration pour éviter les valeurs indéfinies.
+            </div>
+        </div>
+
+        <!-- Slide 6: Portée des variables (scope) -->
+        <div class="slide">
+            <h2>Portée des variables (scope)</h2>
+            <ul>
+                <li>Portée d'un bloc: entre <code>{</code> et <code>}</code></li>
+                <li>Une variable locale n'existe qu'à l'intérieur de son bloc</li>
+                <li>Évitez d'utiliser la même variable dans des blocs imbriqués</li>
+            </ul>
+            <div class="code-example"><pre>#include &lt;iostream&gt;
+int main(){
+    int x = 1;
+    {
+        int x = 2; // masque le x extérieur
+        std::cout &lt;&lt; x; // 2
+    }
+    std::cout &lt;&lt; x; // 1
+}
+</pre></div>
+            <div class="info-box">
+                <strong>Conseil:</strong> déclarez les variables au plus près de leur utilisation.
+            </div>
+        </div>
+
+        <!-- Slide 7: Opérateurs arithmétiques -->
+        <div class="slide">
+            <h2>Opérateurs arithmétiques</h2>
+            <ul>
+                <li><strong>+</strong>, <strong>-</strong>, <strong>*</strong>, <strong>/</strong>, <strong>%</strong> (modulo sur entiers)</li>
+                <li>Division entière tronque (ex: <code>7/2 == 3</code>)</li>
+                <li>Incrément/décrément: <code>++</code>, <code>--</code>; composés: <code>+=</code>, <code>*=</code>, ...</li>
+            </ul>
+            <div class="code-example"><pre>int main() {
+    int a = 7, b = 2;
+    std::cout &lt;&lt; a / b &lt;&lt; "\n";      // 3 (entier)
+    std::cout &lt;&lt; a / 2.0 &lt;&lt; "\n";  // 3.5 (double)
+    a += 5; // 12
+}
+</pre></div>
+        </div>
+
+        <!-- Slide 8: Priorité et parenthèses -->
+        <div class="slide">
+            <h2>Priorité des opérateurs</h2>
+            <ul>
+                <li><code>*</code>, <code>/</code>, <code>%</code> avant <code>+</code>, <code>-</code></li>
+                <li>Utilisez des parenthèses pour la clarté</li>
+                <li>Attention: <code>=</code> (affectation) ≠ <code>==</code> (égalité)</li>
+            </ul>
+            <div class="code-example"><pre>int r1 = 2 + 3 * 4;     // 14
+int r2 = (2 + 3) * 4;   // 20
+if (x == 3) { /* ok */ }
+// if (x = 3) { ... }  // erreur logique fréquente
+</pre></div>
+            <div class="info-box">
+                <strong>Astuce:</strong> ajoutez des parenthèses même si la priorité suffit: votre futur vous vous dira merci.
+            </div>
+        </div>
+
+        <!-- Slide 6: Relationnels et logiques -->
+        <div class="slide">
+            <h2>Relationnels et logiques</h2>
+            <ul>
+                <li>Relationnels: <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code></li>
+                <li>Logiques: <code>&amp;&amp;</code> (ET), <code>||</code> (OU), <code>!</code> (NON), avec court-circuit</li>
+            </ul>
+            <div class="code-example"><pre>bool adulte = (age &gt;= 18);
+if (x != 0 &amp;&amp; y/x &gt; 2) { /* x n'est pas 0 avant la division */ }
+</pre></div>
+            <div class="info-box">
+                <strong>Rappel:</strong> une expression logique vaut <code>true</code> (1) ou <code>false</code> (0).
+            </div>
+        </div>
+
+        <!-- Slide 9: Conversions -->
+        <div class="slide">
+            <h2>Conversions implicites et explicites</h2>
+            <ul>
+                <li>Promotion implicite (ex: <code>int</code> → <code>double</code>) lors de calculs</li>
+                <li>Rétrécissement = perte d’info (ex: <code>3.7</code> → <code>3</code>)</li>
+                <li>Cast explicite recommandé: <code>static_cast&lt;type&gt;(expr)</code></li>
+            </ul>
+            <div class="code-example"><pre>double d = 3;              // OK: 3.0
+ int i{3.7};                // Erreur de compilation (narrowing)
+ int j = static_cast&lt;int&gt;(3.7); // OK: j == 3
+ </pre></div>
+            <div class="info-box">
+                <strong>À éviter:</strong> les <em>casts</em> style C (<code>(int)x</code>) — préférez <code>static_cast</code> plus sûr et lisible.
+            </div>
+        </div>
+
+        <!-- Slide 10: Conversions — erreurs fréquentes -->
+        <div class="slide">
+            <h2>Conversions — erreurs fréquentes</h2>
+            <ul>
+                <li>Mélange <code>unsigned</code> et <code>int</code> peut surprendre (sous-flux)</li>
+                <li>Perte de précision de <code>double</code> → <code>int</code></li>
+                <li>Division entière inattendue si les deux opérandes sont entiers</li>
+            </ul>
+            <div class="code-example"><pre>unsigned ua = 1; int b = -2;
+// b est converti en unsigned avant l'addition
+auto s = ua + b; // valeur très grande selon la plateforme
+
+int q1 = 5/2;     // 2
+double q2 = 5/2;  // 2 (toujours entier avant conversion!)
+double q3 = 5/2.0; // 2.5
+</pre></div>
+            <div class="info-box">
+                <strong>Règle:</strong> forcez le type voulu (ex: <code>2.0</code>) pour éviter la division entière.
+            </div>
+        </div>
+
+        <!-- Slide 8: Exercices (bases) -->
+        <div class="slide">
+            <h2>Exercices — Bases</h2>
+            <h3>Calculatrice simple</h3>
+            <div class="code-example"><pre>#include &lt;iostream&gt;
+int main() {
+    double a{}, b{}; char op{};
+    std::cout &lt;&lt; "Entrez une opération (ex: 3 + 4): ";
+    std::cin &gt;&gt; a &gt;&gt; op &gt;&gt; b;
+    if (op == '+') std::cout &lt;&lt; (a + b);
+    else if (op == '-') std::cout &lt;&lt; (a - b);
+    else if (op == '*') std::cout &lt;&lt; (a * b);
+    else if (op == '/') {
+        if (b != 0) std::cout &lt;&lt; (a / b);
+        else std::cout &lt;&lt; "Erreur: division par 0";
+    } else {
+        std::cout &lt;&lt; "Opérateur inconnu";
+    }
+}
+</pre></div>
+            <h3>Échange de variables</h3>
+            <div class="code-example"><pre>int a = 5, b = 9;
+// Méthode avec variable temporaire (recommandée pour débuter)
+int tmp = a; a = b; b = tmp; // a=9, b=5
+// Ou bien avec la bibliothèque standard
+// #include &lt;utility&gt;
+// std::swap(a, b);
+</pre></div>
+        </div>
+
+        <!-- Slide 11: if/else et switch -->
+        <div class="slide">
+            <h2>Structures conditionnelles</h2>
+            <div class="code-example"><pre>// if / else
+if (note &gt;= 10) {
+    std::cout &lt;&lt; "Admis";
+} else if (note &gt;= 8) {
+    std::cout &lt;&lt; "Rattrapage";
+} else {
+    std::cout &lt;&lt; "Ajourné";
+}
+
+// switch
+switch (jour) {
+    case 1: std::cout &lt;&lt; "Lundi"; break;
+    case 2: std::cout &lt;&lt; "Mardi"; break;
+    default: std::cout &lt;&lt; "Autre"; break;
+}
+</pre></div>
+            <div class="info-box">
+                <strong>Astuce:</strong> n'oubliez pas <code>break</code> dans chaque <code>case</code> pour éviter l'enchaînement non désiré.
+            </div>
+        </div>
+
+        <!-- Slide 12: switch en détail -->
+        <div class="slide">
+            <h2>switch en détail</h2>
+            <ul>
+                <li>Fonctionne avec <code>int</code>, <code>char</code> et énumérations</li>
+                <li>Pas de <code>std::string</code> (utilisez if/else)</li>
+                <li>Groupement de cases possible</li>
+            </ul>
+            <div class="code-example"><pre>char op; double a, b; std::cin &gt;&gt; a &gt;&gt; op &gt;&gt; b;
+switch (op) {
+    case '+': std::cout &lt;&lt; (a+b); break;
+    case '-': std::cout &lt;&lt; (a-b); break;
+    case '*': std::cout &lt;&lt; (a*b); break;
+    case '/': if (b!=0) std::cout &lt;&lt; (a/b); else std::cout &lt;&lt; "Div/0"; break;
+    default: std::cout &lt;&lt; "Opérateur inconnu"; break;
+}
+</pre></div>
+        </div>
+
+        <!-- Slide 13: Boucles -->
+        <div class="slide">
+            <h2>Boucles: for, while, do...while</h2>
+            <div class="code-example"><pre>for (int i = 0; i &lt; 5; ++i) { std::cout &lt;&lt; i; }
+ int j = 5; while (j &gt; 0) { --j; }
+ int k = 0; do { ++k; } while (k &lt; 3);
+ </pre></div>
+            <div class="info-box">
+                <strong>Quand utiliser quoi?</strong> <code>for</code> = nombre d'itérations connu; <code>while</code> = jusqu'à une condition; <code>do...while</code> = au moins une fois.
+            </div>
+        </div>
+
+        <!-- Slide 14: Sauts -->
+        <div class="slide">
+            <h2>break, continue, return</h2>
+            <div class="code-example"><pre>for (int n = 1; n &lt;= 10; ++n) {
+     if (n % 2 == 0) continue; // saute pairs
+     if (n &gt; 7) break;          // arrête la boucle
+     std::cout &lt;&lt; n &lt;&lt; " ";
+ }
+ return; // quitte la fonction
+ </pre></div>
+            <div class="info-box">
+                <strong>Conseil:</strong> utilisez <code>return</code> pour quitter tôt une fonction si une condition n'est pas remplie.
+            </div>
+        </div>
+
+        <!-- Slide 15: Exos contrôle -->
+        <div class="slide">
+            <h2>Exercices — Contrôle</h2>
+            <ul>
+                <li>Tables de multiplication (1..10)</li>
+                <li>Test de primalité (essais jusqu'à √n)</li>
+            </ul>
+            <div class="code-example"><pre>// Tables 1 à 10
+ for (int i = 1; i &lt;= 10; ++i) {
+     for (int j = 1; j &lt;= 10; ++j) {
+         std::cout &lt;&lt; (i * j) &lt;&lt; "\t";
+     }
+     std::cout &lt;&lt; "\n";
+ }
+ 
+ // Primalité
+ bool est_premier(int n){
+     if (n &lt; 2) return false;
+     for (int d = 2; d*d &lt;= n; ++d)
+         if (n % d == 0) return false;
+     return true;
+ }
+ </pre></div>
+        </div>
+
+        <!-- Slide 16: Tableaux (C) -->
+        <div class="slide">
+            <h2>Tableaux — Déclaration et parcours</h2>
+            <div class="code-example"><pre>int t[5] = {1,2,3,4,5}; // taille fixe connue
+ for (int i = 0; i &lt; 5; ++i) {
+     std::cout &lt;&lt; t[i] &lt;&lt; " ";
+ }
+ // Calculer la taille (méthode simple)
+ int taille = sizeof(t) / sizeof(t[0]);
+ </pre></div>
+            <div class="info-box">
+                <strong>Attention:</strong> pas de vérification automatique des indices; restez entre <code>0</code> et <code>taille-1</code>.
+            </div>
+        </div>
+
+        <!-- Slide 17: Tableaux — Saisie et bornes -->
+        <div class="slide">
+            <h2>Tableaux — Saisie et bornes</h2>
+            <div class="code-example"><pre>#include &lt;iostream&gt;
+int main(){
+    const int MAX = 100; int t[MAX];
+    int n; std::cout &lt;&lt; "Combien d'éléments (max 100) ? "; std::cin &gt;&gt; n;
+    if (n &gt; MAX) { std::cout &lt;&lt; "Tronqué à 100\n"; n = MAX; }
+    for (int i = 0; i &lt; n; ++i) std::cin &gt;&gt; t[i];
+    // Afficher
+    for (int i = 0; i &lt; n; ++i) std::cout &lt;&lt; t[i] &lt;&lt; ' ';
+}
+</pre></div>
+            <div class="info-box">
+                <strong>Règle d'or:</strong> ne dépassez jamais la taille du tableau — comportement indéfini.
+            </div>
+        </div>
+
+        <!-- Slide 18: Tableaux multidimensionnels -->
+        <div class="slide">
+            <h2>Tableaux multidimensionnels</h2>
+            <div class="code-example"><pre>int m[2][3] {{1,2,3},{4,5,6}};
+ for (int i=0;i&lt;2;++i)
+   for (int j=0;j&lt;3;++j)
+     std::cout &lt;&lt; m[i][j] &lt;&lt; ' ';
+ </pre></div>
+        </div>
+
+        <!-- Slide 19: Chaînes de caractères -->
+        <div class="slide">
+            <h2>Chaînes: char[] vs std::string</h2>
+            <div class="code-example"><pre>#include &lt;iostream&gt;
+#include &lt;string&gt;
+char cstr[] = "Bonjour";          // tableau de char terminé par '\0'
+std::string s = "Hello";          // chaîne C++
+s += ", world";                   // concaténation
+std::cout &lt;&lt; s.size();             // longueur
+
+// Lecture d'une ligne entière (avec espaces)
+std::string nom;
+std::getline(std::cin, nom);
+</pre></div>
+            <div class="info-box">
+                <strong>Conseil:</strong> préférez <code>std::string</code> au quotidien; utilisez <code>char[]</code> pour compatibilité C.
+            </div>
+        </div>
+
+        <!-- Slide 20: Parcours d'un tableau (exemples) -->
+        <div class="slide">
+            <h2>Parcours d'un tableau (exemples)</h2>
+            <div class="code-example"><pre>// Somme des éléments
+int t[5] = {1,2,3,4,5};
+int somme = 0;
+for (int i = 0; i &lt; 5; ++i) somme += t[i];
+std::cout &lt;&lt; "Somme = " &lt;&lt; somme;
+
+// Recherche d'un élément
+int cible = 3; bool trouve = false;
+for (int i = 0; i &lt; 5; ++i) if (t[i] == cible) { trouve = true; break; }
+</pre></div>
+        </div>
+
+        <!-- Slide 21: Exos tableaux/chaînes -->
+        <div class="slide">
+            <h2>Exercices — Tableaux et chaînes</h2>
+            <ul>
+                <li>Lire N nombres, les afficher et calculer la moyenne</li>
+                <li>Recherche d'un élément (retourner l'index ou -1)</li>
+                <li>Inverser une chaîne manuellement</li>
+            </ul>
+            <div class="code-example"><pre>// Inversion manuelle d'une chaîne std::string s
+for (size_t i = 0, j = s.size() - 1; i &lt; j; ++i, --j) {
+    char tmp = s[i]; s[i] = s[j]; s[j] = tmp;
+}
+</pre></div>
+        </div>
+
+        <!-- Slide 22: Récap -->
+        <div class="slide">
+            <h2>Récap & bonnes pratiques</h2>
+            <ul>
+                <li>Déclarez/initialisez clairement vos variables; utilisez <strong>const</strong> quand possible</li>
+                <li>Comprenez la différence <strong>int</strong> vs <strong>double</strong> et la division entière</li>
+                <li>Faites attention aux indices des tableaux (0 à n−1)</li>
+                <li>Préférez <strong>std::string</strong> pour les chaînes</li>
+                <li>Pratiquez avec les exercices pour ancrer les notions</li>
+            </ul>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+            <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">24</span></span>
+            <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+        </div>
+    </div>
+
+    <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

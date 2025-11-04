@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="plugins-jetbrains">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/jetbrains/plugins-jetbrains/hideme.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jetbrains/plugins-jetbrains/power.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jetbrains/plugins-jetbrains/dns.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jetbrains/plugins-jetbrains/url.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 3 — Fonctions et Références (niveau L2)</title>
+    <link rel="stylesheet" href="assets/css/cpp_intro.css">
+    <meta name="description" content="Notions essentielles pour débuter en C++ quand on vient du C : fonctions, paramètres par défaut, surcharge simple, références, const, organisation minimale en fichiers.">
+</head>
+<body>
+    <div class="presentation-container">
+        <a class="back-link" href="index.html">← Retour au menu</a>
+
+        <!-- Slide 1: Titre -->
+        <div class="slide active title-slide">
+            <h1>Chapitre 3 — Fonctions et Références</h1>
+
+        </div>
+
+        <!-- Slide 2: Objectifs -->
+        <div class="slide">
+            <h2>Objectifs du chapitre</h2>
+            <ul>
+                <li>Savoir écrire et appeler des fonctions en C++</li>
+                <li>Découvrir les paramètres par défaut (nouveau vs C)</li>
+                <li>Comprendre les <strong>références</strong> et quand les utiliser</li>
+                <li>Utiliser <strong>const</strong> pour éviter les copies inutiles</li>
+                <li>Organiser un petit projet en <code>.hpp</code> + <code>.cpp</code></li>
+            </ul>
+            <div class="info-box"><strong>Important :</strong> on reste volontairement simple. Les sujets avancés (templates, constexpr, ODR détaillée) viendront plus tard.</div>
+        </div>
+
+        <!-- Slide 3: Définir et appeler -->
+        <div class="slide">
+            <h2>Définir et appeler une fonction</h2>
+            <div class="code-example"><pre>#include &lt;iostream&gt;
+
+int carre(int x) {     // définition
+    return x * x;
+}
+
+int main() {
+    std::cout &lt;&lt; carre(5); // appel
+}
+</pre></div>
+            <ul>
+                <li>Signature = <code>type_retour nom(paramètres)</code></li>
+                <li>Comme en C, mais on utilisera souvent C++ pour éviter les copies inutiles</li>
+            </ul>
+        </div>
+
+        <!-- Slide 4: Paramètres par défaut -->
+        <div class="slide">
+            <h2>Paramètres par défaut (nouveau vs C)</h2>
+            <div class="code-example"><pre>// Déclaration avec valeur par défaut (dans un header ou en haut de fichier)
+int puissance(int x, int n = 2);
+
+// Définition (la valeur par défaut n'est pas répétée ici)
+int puissance(int x, int n) { int r = 1; while (n--) r *= x; return r; }
+
+// Utilisation
+puissance(4);     // 4^2 = 16
+puissance(2, 10); // 1024
+</pre></div>
+            <div class="info-box"><strong>Règle :</strong> mettre les valeurs par défaut dans la <em>déclaration</em>, pas dans la définition.</div>
+        </div>
+
+        <!-- Slide 5: Surcharge simple -->
+        <div class="slide">
+            <h2>Surcharge de fonctions (simple)</h2>
+            <div class="code-example"><pre>int    max(int a, int b)       { return (a &lt; b) ? b : a; }
+double max(double a, double b) { return (a &lt; b) ? b : a; }
+
+max(3, 5);       // appelle version int
+max(3.0, 5.0);   // appelle version double
+</pre></div>
+            <ul>
+                <li>Même nom, paramètres différents → le compilateur choisit</li>
+                <li>Très pratique pour garder une API simple</li>
+            </ul>
+        </div>
+
+        <!-- Slide 6: Références - idée -->
+        <div class="slide">
+            <h2>Références — idée clé</h2>
+            <ul>
+                <li>Une <strong>référence</strong> est un autre nom pour une variable existante</li>
+                <li>Permet de modifier l’argument sans utiliser de pointeur</li>
+                <li>Syntaxe: <code>type&amp; nom</code></li>
+            </ul>
+            <div class="code-example"><pre>void incrementer(int&amp; x) { // x fait référence à l'original
+    ++x;                  // donc on le modifie directement
+}
+
+int a = 10;
+incrementer(a); // a devient 11
+</pre></div>
+            <div class="info-box"><strong>Comparaison :</strong> en C, on ferait <code>void inc(int* px)</code> et on appellerait avec <code>&amp;a</code>. En C++, on préfère la référence pour la clarté.</div>
+        </div>
+
+        <!-- Slide 7: Pointeur ou référence ? -->
+        <div class="slide">
+            <h2>Pointeur ou référence ?</h2>
+            <ul>
+                <li><strong>Référence</strong> (<code>T&amp;</code>) : quand l’argument doit exister et qu’on veut le modifier facilement</li>
+                <li><strong>Pointeur</strong> (<code>T*</code>) : quand l’argument peut être <code>nullptr</code> (optionnel)</li>
+                <li><strong>Valeur</strong> (<code>T</code>) : pour les petits types (int, double) ou si on veut une copie</li>
+            </ul>
+            <div class="code-example"><pre>void set_si_non_nul(int* p, int v) {
+    if (p) *p = v; // optionnel → pointeur
+}
+
+void set_obligatoire(int&amp; r, int v) {
+    r = v; // doit exister → référence
+}
+</pre></div>
+        </div>
+
+        <!-- Slide 8: const & éviter les copies -->
+        <div class="slide">
+            <h2>Lire sans copier un tableau</h2>
+            <div class="code-example"><pre>double moyenne(const double t[], int n) {
+    if (n &lt;= 0) return 0.0;
+    double s = 0.0;
+    for (int i = 0; i &lt; n; ++i) s += t[i];
+    return s / n;
+}
+</pre></div>
+            <ul>
+                <li>Paramètre <code>const type[]</code> (équiv. <code>const type*</code>) pour lire sans copier</li>
+                <li>On passe aussi la taille <code>n</code> du tableau</li>
+            </ul>
+        </div>
+
+        <!-- Slide 9: Namespaces (basique) -->
+        <div class="slide">
+            <h2>Namespaces — version basique</h2>
+            <div class="code-example"><pre>namespace math {
+    int carre(int x) { return x*x; }
+}
+
+int r = math::carre(5);
+
+// Éviter au niveau global : using namespace std;
+// OK localement dans une fonction courte :
+void demo() {
+    using std::cout; using std::endl;
+    cout &lt;&lt; math::carre(3) &lt;&lt; endl;
+}
+</pre></div>
+            <div class="info-box"><strong>But :</strong> éviter les collisions de noms et mieux organiser le code.</div>
+        </div>
+
+        <!-- Slide 10: Organiser en fichiers -->
+        <div class="slide">
+            <h2>Organiser un mini‑projet</h2>
+            <ul>
+                <li><strong>Header</strong> (<code>.hpp</code>) : déclarations visibles (ce qu’on « promet »)</li>
+                <li><strong>Source</strong> (<code>.cpp</code>) : définitions (le « comment »)</li>
+                <li>Protéger le header avec <code>#pragma once</code></li>
+            </ul>
+            <div class="code-example"><pre>// math_utils.hpp
+#pragma once
+int carre(int x);
+
+// math_utils.cpp
+#include "math_utils.hpp"
+int carre(int x) { return x*x; }
+
+// main.cpp
+#include &lt;iostream&gt;
+#include "math_utils.hpp"
+int main(){ std::cout &lt;&lt; carre(6); }
+</pre></div>
+        </div>
+
+        <!-- Slide 11: Compiler (multi-fichiers) -->
+        <div class="slide">
+            <h2>Compiler (multi‑fichiers)</h2>
+            <ul>
+                <li>macOS / clang++
+                    <div class="code-example"><pre>clang++ -std=c++17 main.cpp math_utils.cpp -O2 -o app &amp;&amp; ./app</pre></div>
+                </li>
+                <li>Windows / MSVC
+                    <div class="code-example"><pre>cl /EHsc /std:c++17 main.cpp math_utils.cpp &amp;&amp; app.exe</pre></div>
+                </li>
+                <li>Windows / MinGW
+                    <div class="code-example"><pre>g++ -std=c++17 main.cpp math_utils.cpp -O2 -o app.exe &amp;&amp; ./app.exe</pre></div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 12: Exemple guidé -->
+        <div class="slide">
+            <h2>Exemple guidé : notes</h2>
+            <div class="code-example"><pre>#include &lt;iostream&gt;
+
+double moyenne(const int t[], int n) {
+    if (n &lt;= 0) return 0.0;
+    int s = 0;
+    for (int i = 0; i &lt; n; ++i) s += t[i];
+    return double(s) / n;
+}
+
+void boost(int&amp; note) { if (note &lt; 20) ++note; }
+
+int main(){
+    int notes[] = {12, 9, 14};
+    int n = sizeof(notes) / sizeof(notes[0]);
+    for (int i = 0; i &lt; n; ++i) boost(notes[i]);  // modifier par référence
+    std::cout &lt;&lt; moyenne(notes, n) &lt;&lt; "\n";
+}
+</pre></div>
+        </div>
+
+        <!-- Slide 13: Exercices -->
+        <div class="slide">
+            <h2>Exercices (progressifs)</h2>
+            <ul>
+                <li>Écrire <code>min3(a,b,c)</code> (int) puis une surcharge <code>min3(double,...)</code></li>
+                <li>Écrire <code>remplacer(int&amp; x, int val=0)</code> puis tester</li>
+                <li>Écrire <code>moyenne(const double t[], int n)</code></li>
+                <li>Créer <code>math_utils.hpp/.cpp</code> avec <code>carre</code> et <code>cube</code> et un petit <code>main.cpp</code></li>
+            </ul>
+        </div>
+
+        <!-- Slide 14: Erreurs fréquentes -->
+        <div class="slide">
+            <h2>Erreurs fréquentes & astuces</h2>
+            <ul>
+                <li>Oublier le <code>&amp;</code> dans un paramètre par référence → pas de modification côté appelant</li>
+                <li>Oublier <code>const</code> pour un gros objet en lecture seule → copie inutile</li>
+                <li>Placer les valeurs par défaut dans la <em>définition</em> → mettez‑les dans la <em>déclaration</em></li>
+                <li><code>using namespace std;</code> global → préférez <code>std::</code> ou des <code>using</code> locaux</li>
+            </ul>
+        </div>
+
+        <!-- Slide 15: Pourquoi des fonctions ? -->
+        <div class="slide">
+            <h2>Pourquoi des fonctions ?</h2>
+            <ul>
+                <li>Éviter la répétition (DRY)</li>
+                <li>Rendre le code plus lisible et testable</li>
+                <li>Isoler une idée = faciliter le débogage</li>
+                <li>Nommer ce que fait le code (« <em>carre</em> », « <em>moyenne</em> »)</li>
+            </ul>
+            <div class="info-box"><strong>Astuce :</strong> une fonction = une responsabilité claire, nom verbe+noms.</div>
+        </div>
+
+        <!-- Slide 16: Anatomie d'une fonction -->
+        <div class="slide">
+            <h2>Anatomie d'une fonction</h2>
+            <div class="code-example"><pre>// type_retour  nom     (paramètres)
+int            somme   (int a, int b) { return a + b; }
+
+void afficher_message(const std::string&amp; msg) {
+    std::cout &lt;&lt; msg &lt;&lt; "\n";
+}
+</pre></div>
+            <ul>
+                <li><strong>Type de retour</strong> : <code>int</code>, <code>double</code>, <code>void</code>…</li>
+                <li><strong>Paramètres</strong> : ordre clair; noms explicites</li>
+                <li><strong>Corps</strong> : court et simple → extraire en sous‑fonctions si besoin</li>
+            </ul>
+        </div>
+
+        <!-- Slide 17: void et return -->
+        <div class="slide">
+            <h2><code>void</code> et <code>return</code></h2>
+            <div class="code-example"><pre>void saluer(const std::string&amp; nom) {
+    if (nom.empty()) return; // quitte tôt
+    std::cout &lt;&lt; "Bonjour " &lt;&lt; nom &lt;&lt; "\n";
+}
+
+// Retourner un résultat + signaler une erreur
+bool division(double a, double b, double&amp; result) {
+    if (b == 0) return false; // erreur
+    result = a / b; return true;
+}
+</pre></div>
+            <div class="info-box"><strong>Pattern utile :</strong> retourner <code>bool</code> pour succès/échec et écrire le résultat via une référence.</div>
+        </div>
+
+        <!-- Slide 18: Détails sur les références -->
+        <div class="slide">
+            <h2>Références — détails importants</h2>
+            <ul>
+                <li>Doivent être <strong>initialisées</strong> dès la déclaration</li>
+                <li>Ne peuvent pas être <strong>nulles</strong></li>
+                <li>Ne peuvent pas être <strong>réaffectées</strong> pour référencer autre chose</li>
+            </ul>
+            <div class="code-example"><pre>int a = 5; int b = 9;
+int&amp; r = a;   // OK
+r = 7;        // modifie a
+// int&amp; r2;   // erreur: non initialisée
+// r = b;     // modifie a (r n'est pas « réassignée » à b)
+</pre></div>
+        </div>
+
+        <!-- Slide 19: Parcourir avec &amp; et const&amp; -->
+        <div class="slide">
+            <h2>Parcourir avec <code>&amp;</code> et <code>const&amp;</code></h2>
+            <div class="code-example"><pre>#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+int v[] = {1, 2, 3};
+for (int i = 0; i &lt; 3; ++i) {
+    int&amp; x = v[i];  // référence sur l'élément
+    x *= 2;         // modifie le tableau
+}
+
+std::string noms[] = {"Ana", "Leo"};
+for (int i = 0; i &lt; 2; ++i) {
+    const std::string&amp; s = noms[i]; // lit sans copier
+    std::cout &lt;&lt; s &lt;&lt; "\n";
+}
+</pre></div>
+            <div class="info-box"><strong>Règle simple :</strong> <code>&amp;</code> pour modifier; <code>const&amp;</code> pour lire sans copier.</div>
+        </div>
+
+        <!-- Slide 20: Surcharge — pièges courants -->
+        <div class="slide">
+            <h2>Surcharge — pièges courants</h2>
+            <div class="code-example"><pre>int    max(int, int);
+double max(double, double);
+
+max(2, 2.0);   // convertit 2 → 2.0, appelle version double
+// max(2.0f, 2.0); // conversions possibles mais surprises → harmonisez les types
+
+// Conseil: utilisez des suffixes
+max(2.0, 5.0); // clair
+max(2, 5);     // clair
+</pre></div>
+            <div class="info-box"><strong>Conseil :</strong> évitez de mélanger les types dans un même appel si possible.</div>
+        </div>
+
+        <!-- Slide 21: Paramètres par défaut — règles -->
+        <div class="slide">
+            <h2>Paramètres par défaut — règles pratiques</h2>
+            <ul>
+                <li>Seuls les <strong>derniers</strong> paramètres peuvent avoir une valeur par défaut</li>
+                <li>Mettez les valeurs par défaut <strong>une seule fois</strong> (dans la déclaration)</li>
+                <li>Évitez de répartir plusieurs déclarations avec des valeurs différentes</li>
+            </ul>
+            <div class="code-example"><pre>int coupe(const std::string&amp; s, char sep = ' ');
+// int coupe(const std::string&amp; s, char sep = ';'); // 🚫 re-définition par défaut
+</pre></div>
+        </div>
+
+        <!-- Slide 22: Namespaces — organiser vos fonctions -->
+        <div class="slide">
+            <h2>Namespaces — organiser vos fonctions</h2>
+            <div class="code-example"><pre>// utils.hpp
+#pragma once
+namespace utils { int carre(int x); }
+
+// utils.cpp
+#include "utils.hpp"
+int utils::carre(int x){ return x*x; }
+
+// main.cpp
+#include &lt;iostream&gt;
+#include "utils.hpp"
+int main(){ std::cout &lt;&lt; utils::carre(4); }
+</pre></div>
+            <div class="info-box"><strong>Bonne pratique :</strong> évitez <code>using namespace</code> global dans les headers.</div>
+        </div>
+
+        <!-- Slide 23: Headers — #pragma once et guards -->
+        <div class="slide">
+            <h2>Headers — <code>#pragma once</code> et include guards</h2>
+            <div class="code-example"><pre>// Méthode simple
+#pragma once
+
+// Méthode portable classique
+#ifndef MATH_UTILS_HPP
+#define MATH_UTILS_HPP
+int carre(int x);
+#endif
+</pre></div>
+            <div class="info-box"><strong>But :</strong> empêcher les inclusions multiples du même header.</div>
+        </div>
+
+        <!-- Slide 24: Mini‑projet pas à pas -->
+        <div class="slide">
+            <h2>Mini‑projet pas à pas</h2>
+            <ul>
+                <li>1) Créez <code>math_utils.hpp/.cpp</code> avec <code>carre</code> et <code>puissance(int x, int n=2)</code></li>
+                <li>2) Créez <code>main.cpp</code> qui lit deux nombres et affiche <code>max</code>, <code>moyenne</code></li>
+                <li>3) Évitez les copies : <code>const&amp;</code> pour <code>std::string</code>, et pour les tableaux passez <code>t[]</code> + <code>n</code></li>
+                <li>4) Compilez :</li>
+            </ul>
+            <div class="code-example"><pre>clang++ -std=c++17 main.cpp math_utils.cpp -O2 -o app &amp;&amp; ./app
+// ou
+cl /EHsc /std:c++17 main.cpp math_utils.cpp &amp;&amp; app.exe
+</pre></div>
+            <div class="info-box"><strong>À faire chez vous :</strong> ajoutez une surcharge de <code>max</code> pour <code>double</code>.</div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+            <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">24</span></span>
+            <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+        </div>
+    </div>
+
+    <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@
     <title>TD — Chapitres 2–3 (Algo, Logique, Fonctions)</title>
     <link rel="stylesheet" href="assets/css/cpp_intro.css">
     <meta name="description"
-          content="10 exercices clairs et progressifs (≈2h) couvrant bases C++ (chapitre 2) et fonctions/références (chapitre 3).">
+          content="10 exercices clairs et progressifs couvrant bases C++ (chapitre 2) et fonctions/références (chapitre 3).">
     <meta name="robots" content="noindex">
     <meta name="author" content="Cours C++ L2">
     <meta name="theme-color" content="#667eea">
@@ -20,7 +20,7 @@
     <!-- Slide 1: Titre -->
     <div class="slide active title-slide">
         <h1>TD — Chapitres 2–3</h1>
-        <p class="subtitle">10 exercices clairs et progressifs (≈ 2h)</p>
+        <p class="subtitle">10 exercices clairs et progressifs</p>
     </div>
 
     <!-- Slide 2: Consignes -->
@@ -28,7 +28,7 @@
         <h2>Consignes générales</h2>
         <ul>
             <li>Niveau: L2. Objectifs: rigueur, logique, propreté du code.</li>
-            <li>Difficulté croissante (1 → 10). Temps total visé ≈ 2h.</li>
+            <li>Difficulté croissante (1 → 10).</li>
             <li>Compiler C++17. Ex: <code>clang++ -std=c++17 -O2 main.cpp -o app</code></li>
             <li>Respecter les signatures demandées. Utiliser <code>const</code> et références quand pertinent.</li>
             <li>Écrire un <code>main()</code> minimal pour tester; garder des entrées simples (stdin).</li>
@@ -100,7 +100,7 @@ int main(){
 // Entrée: 2 x 3    → Sortie: Erreur
 </pre>
         </div>
-        <div class="info-box">Durée cible: 8–10 min. Indice: utilisez <code>switch(op)</code> et vérifiez <code>b != 0</code> avant la division.</div>
+        <div class="info-box">Indice: utilisez <code>switch(op)</code> et vérifiez <code>b != 0</code> avant la division.</div>
     </div>
 
     <!-- Exercice 3 -->
@@ -147,7 +147,7 @@ const char* classify(const int t[], int n);
 // [3,3,2,2]      → NON_INC
 // [1,3,2]        → AUCUNE
 </pre></div>
-        <div class="info-box">Durée cible: 12 min. Attention à bien distinguer NON_DEC de STRICT_INC (présence d’au moins une égalité).</div>
+        <div class="info-box">Attention à bien distinguer NON_DEC de STRICT_INC (présence d’au moins une égalité).</div>
     </div>
 
     <!-- Exercice 4 -->
@@ -209,7 +209,7 @@ int main(){
 // 3) doublons:  [3,3],     cible=6 → (0,1)
 // 4) aucun cas: [1,2,3],   cible=0 → false
 </pre></div>
-        <div class="info-box">Durée cible: 12–14 min. Pièges: bien imposer j &gt; i, ne pas sortir des bornes, ne pas modifier le tableau.</div>
+        <div class="info-box">Pièges: bien imposer j &gt; i, ne pas sortir des bornes, ne pas modifier le tableau.</div>
     </div>
 
     <!-- Exercice 5 -->
@@ -265,7 +265,7 @@ int main(){
 // - Tous identiques ; tous distincts
 // - Longues séries au début/au milieu/à la fin
 </pre></div>
-        <div class="info-box">Durée cible: 10–12 min. Bien réfléchir à la comparaison avec l'élément précédent gardé (index write-1).</div>
+        <div class="info-box">Bien réfléchir à la comparaison avec l'élément précédent gardé (index write-1).</div>
     </div>
 
     <!-- Exercice 6 -->
@@ -293,7 +293,7 @@ bool palindrome(const std::string&amp; s);
 // "Engage le jeu que je le gagne" → true
 // "Hello, World!"                 → false
 </pre></div>
-        <div class="info-box">Durée cible: 10 min. Toujours caster en <code>(unsigned char)</code> avant <code>std::tolower</code> et <code>std::isalnum</code>.</div>
+        <div class="info-box">Toujours caster en <code>(unsigned char)</code> avant <code>std::tolower</code> et <code>std::isalnum</code>.</div>
     </div>
 
     <!-- Exercice 7 -->
@@ -316,7 +316,7 @@ std::string rle_encode(const std::string&amp; s);
 
 // Bonus (optionnel): rle_decode.
 </pre></div>
-        <div class="info-box">Durée cible: 8 min. Ne pas oublier d’ajouter le dernier groupe après la boucle.</div>
+        <div class="info-box">Ne pas oublier d’ajouter le dernier groupe après la boucle.</div>
     </div>
 
     <!-- Exercice 8 -->
@@ -346,7 +346,7 @@ bool saddle_point(const int M[][MAXC], int rows, int cols, int&amp; r, int&amp; 
 
 // Retourne true si trouvé et écrit (r,c), sinon false.
 </pre></div>
-        <div class="info-box">Durée cible: 12–14 min. Complexité simple: O(rows×cols). Vérifier soigneusement la définition.</div>
+        <div class="info-box">Complexité simple: O(rows×cols). Vérifier soigneusement la définition.</div>
     </div>
 
     <!-- Exercice 9 -->

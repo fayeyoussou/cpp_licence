@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cours complémentaire — Références & Pointeurs</title>
+  <link rel="stylesheet" href="assets/css/cpp_intro.css">
+  <meta name="description" content="Présentation détaillée sur les références et pointeurs en C++ avec fonctions, tableaux et bonnes pratiques.">
+</head>
+<body>
+  <div class="presentation-container">
+    <a class="back-link" href="index.html">← Retour au menu</a>
+
+    <!-- Slide 1: Titre -->
+    <div class="slide active title-slide">
+      <h1>Références & Pointeurs</h1>
+      <p class="subtitle">Cours complémentaire (fonctions, tableaux, const, bonnes pratiques)</p>
+    </div>
+
+    <!-- Slide 2: Objectifs -->
+    <div class="slide">
+      <h2>Objectifs</h2>
+      <ul>
+        <li>Comprendre adresses, déréférencement, <code>nullptr</code>, arithmétique de pointeur</li>
+        <li>Choisir entre valeur, référence (<code>&amp;</code>) et pointeur (<code>*</code>)</li>
+        <li>Maîtriser <code>const</code> avec références et pointeurs</li>
+        <li>Passer des tableaux aux fonctions (et tailles)</li>
+        <li>Identifier pièges fréquents et bonnes pratiques modernes</li>
+      </ul>
+    </div>
+
+    <!-- Slide 3: Mémoire & adresses -->
+    <div class="slide">
+      <h2>Mémoire & adresses</h2>
+      <ul>
+        <li>Chaque variable vit à une adresse; <code>&amp;x</code> obtient son adresse</li>
+        <li>Deux zones courantes: pile (stack) et tas (heap)</li>
+      </ul>
+      <div class="code-example"><pre>#include &lt;iostream&gt;
+int main(){
+  int x = 42;
+  std::cout &lt;&lt; &amp;x &lt;&lt; "\n"; // adresse de x
+}
+</pre></div>
+      <div class="info-box">Astuce: penser « boîte (variable) » et « étiquette (adresse) ».</div>
+    </div>
+
+    <!-- Slide 4: Pointeurs, base -->
+    <div class="slide">
+      <h2>Pointeurs — bases</h2>
+      <ul>
+        <li><code>T* p</code> stocke une adresse vers un <code>T</code></li>
+        <li><code>*p</code> déréférence (accède à l’objet ciblé)</li>
+        <li><code>nullptr</code> = ne pointe vers rien</li>
+      </ul>
+      <div class="code-example"><pre>int a = 10;
+int* p = &amp;a;     // p pointe vers a
+*p = 11;         // modifie a via p
+p = nullptr;     // p ne pointe plus vers rien
+</pre></div>
+      <div class="info-box">Ne jamais déréférencer un <code>nullptr</code> ou un pointeur non initialisé.</div>
+    </div>
+
+    <!-- Slide 5: Références, base -->
+    <div class="slide">
+      <h2>Références — bases</h2>
+      <ul>
+        <li><code>T&amp; r</code> est un autre nom pour une variable existante</li>
+        <li>Doit être initialisée; ne peut pas être nulle ni réassignée</li>
+      </ul>
+      <div class="code-example"><pre>int x = 5; int&amp; r = x; r = 7; // x == 7
+// int&amp; r2;      // 🚫 non, non initialisée
+// r = autre;    // 🚫 ne « re-binde » pas; assigne x
+</pre></div>
+      <div class="info-box">Référence: plus simple à utiliser que pointeur si l’objet existe toujours.</div>
+    </div>
+
+    <!-- Slide 6: Choisir valeur / &amp; / * -->
+    <div class="slide">
+      <h2>Choisir valeur / &amp; / *</h2>
+      <ul>
+        <li>Valeur (<code>T</code>): petits types, besoin de copie indépendante</li>
+        <li>Réf (<code>T&amp;</code>): modifier l’argument, argument non optionnel</li>
+        <li>Const réf (<code>const T&amp;</code>): lire gros objet sans copie</li>
+        <li>Pointeur (<code>T*</code>): argument optionnel (<code>nullptr</code> possible)</li>
+      </ul>
+      <div class="code-example"><pre>void set_obligatoire(int&amp; r, int v){ r = v; }
+void set_si_present(int* p, int v){ if (p) *p = v; }
+</pre></div>
+    </div>
+
+    <!-- Slide 7: Exemple swap -->
+    <div class="slide">
+      <h2>Exemple: swap</h2>
+      <div class="code-example"><pre>void swap_ref(int&amp; a, int&amp; b){ int t=a; a=b; b=t; }
+void swap_ptr(int* a, int* b){ if(a&amp;&amp;b){ int t=*a; *a=*b; *b=t; }}
+// swap_val(int a, int b) // inutile: ne change pas les originaux
+</pre></div>
+      <div class="info-box">Préférer la version par référence en C++ pour les variables obligatoires.</div>
+    </div>
+
+    <!-- Slide 8: Paramètres sortie -->
+    <div class="slide">
+      <h2>Paramètres « sortie »</h2>
+      <div class="code-example"><pre>bool division(double a, double b, double&amp; out){
+  if (b == 0) return false; out = a/b; return true;
+}
+bool division_opt(double a, double b, double* out){
+  if (!out || b==0) return false; *out = a/b; return true;
+}
+</pre></div>
+      <div class="info-box">Réf si toujours présent; pointeur si optionnel.</div>
+    </div>
+
+    <!-- Slide 9: const avec &amp; et * -->
+    <div class="slide">
+      <h2>const avec &amp; et *</h2>
+      <div class="code-example"><pre>void lire(const std::string&amp; s); // ne copie pas, ne modifie pas
+const int* p;   // lit des int (pointeur vers const int)
+int* const q=p; // q constant, pointe vers int modifiables
+const int* const r=p; // ni la cible ni le pointeur ne changent
+</pre></div>
+      <div class="info-box">Règle: le <code>const</code> s’applique à ce qui est à gauche de <code>*</code> (ou à droite s’il n’y a rien à gauche).</div>
+    </div>
+
+    <!-- Slide 10: Tableaux et * -->
+    <div class="slide">
+      <h2>Tableaux et pointeurs</h2>
+      <ul>
+        <li>Un <code>T arr[N]</code> « décroit » en <code>T*</code> dans les appels de fonctions</li>
+        <li>Passer aussi la taille <code>n</code></li>
+      </ul>
+      <div class="code-example"><pre>int somme(const int* t, int n){ int s=0; for(int i=0;i&lt;n;++i) s+=t[i]; return s; }
+int main(){ int a[3]={1,2,3}; std::cout &lt;&lt; somme(a,3); }
+</pre></div>
+      <div class="info-box">Pas de vérification d’indices: rester dans [0, n-1].</div>
+    </div>
+
+    <!-- Slide 11: Arithmétique de pointeur -->
+    <div class="slide">
+      <h2>Arithmétique de pointeur</h2>
+      <div class="code-example"><pre>int a[5]={10,20,30,40,50};
+int* p = a;         // &amp;a[0]
+int* e = a + 5;     // après le dernier
+for(; p!=e; ++p) std::cout &lt;&lt; *p &lt;&lt; ' ';
+</pre></div>
+      <div class="info-box">Jamais d’arithmétique en dehors du même tableau.</div>
+    </div>
+
+    <!-- Slide 12: Tableaux 2D -->
+    <div class="slide">
+      <h2>Tableaux 2D</h2>
+      <div class="code-example"><pre>void print2(const int m[][3], int rows){
+  for(int i=0;i&lt;rows;++i){
+    for(int j=0;j&lt;3;++j) std::cout &lt;&lt; m[i][j] &lt;&lt; ' ';
+    std::cout &lt;&lt; "\n";
+  }
+}
+int M[2][3] = {{1,2,3},{4,5,6}}; // 2 lignes, 3 colonnes
+</pre></div>
+      <div class="info-box">La 2ᵉ dimension doit être connue à la compilation.</div>
+    </div>
+
+    <!-- Slide 13: C‑strings vs string -->
+    <div class="slide">
+      <h2>C‑strings vs std::string</h2>
+      <div class="code-example"><pre>char s1[] = "Hello"; // char[6], avec '\0'
+const char* p = s1;  // pointeur vers char
+std::string s2 = "Hello";
+s2 += " world";
+</pre></div>
+      <div class="info-box">Préférer <code>std::string</code> au quotidien; <code>char*</code> pour compat C / bas niveau.</div>
+    </div>
+
+    <!-- Slide 14: Références sur éléments -->
+    <div class="slide">
+      <h2>Références sur éléments</h2>
+      <div class="code-example"><pre>int v[3]={1,2,3};
+int&amp; r = v[1]; // référence sur v[1]
+r *= 10;       // v devient {1,20,3}
+
+// Parcours par référence
+for (int i=0;i&lt;3;++i){ int&amp; x = v[i]; x += 1; }
+</pre></div>
+      <div class="info-box">Une référence « alias » l’élément: modifications visibles dans le tableau.</div>
+    </div>
+
+    <!-- Slide 15: nullptr & validation -->
+    <div class="slide">
+      <h2>nullptr & validation</h2>
+      <div class="code-example"><pre>void set_if_not_null(int* p, int v){ if (p) *p = v; }
+int* find(int* t, int n, int cible){
+  for(int i=0;i&lt;n;++i) if (t[i]==cible) return &amp;t[i];
+  return nullptr;
+}
+</pre></div>
+      <div class="info-box">Toujours tester un pointeur optionnel avant usage.</div>
+    </div>
+
+    <!-- Slide 16: new/delete (à éviter) -->
+    <div class="slide">
+      <h2>new/delete (à éviter)</h2>
+      <div class="code-example"><pre>// Exemple pédagogique (préférer std::vector)
+int* t = new int[3]{1,2,3};
+// ... utiliser t[0..2]
+delete[] t; t = nullptr;
+</pre></div>
+      <div class="info-box">Préférer <code>std::vector&lt;T&gt;</code>, <code>std::unique_ptr</code> (RAII) pour éviter les fuites.</div>
+    </div>
+
+    <!-- Slide 17: Réf et temporaires -->
+    <div class="slide">
+      <h2>Références et temporaires</h2>
+      <div class="code-example"><pre>int f();
+// int&amp; r = f();        // 🚫 ne compile pas (réf non-const sur temporaire)
+const int&amp; cr = f();    // OK: prolonge la durée de vie du temporaire
+</pre></div>
+      <div class="info-box">Utiliser <code>const&amp;</code> pour lier un temporaire (valeurs de retour, expressions).</div>
+    </div>
+
+    <!-- Slide 18: Pointeurs de fonctions -->
+    <div class="slide">
+      <h2>Pointeurs de fonctions (simple)</h2>
+      <div class="code-example"><pre>int carre(int x){ return x*x; }
+int applique(int(*f)(int), int x){ return f(x); }
+int r = applique(&amp;carre, 5); // 25
+</pre></div>
+      <div class="info-box">Alternative moderne: lambdas et <code>std::function</code> (plus tard).</div>
+    </div>
+
+    <!-- Slide 19: Bonnes pratiques -->
+    <div class="slide">
+      <h2>Bonnes pratiques</h2>
+      <ul>
+        <li>Par défaut: passer par référence (<code>const&amp;</code> pour lire, <code>&amp;</code> pour modifier)</li>
+        <li>Utiliser pointeurs pour signifier « optionnel » (<code>nullptr</code>)</li>
+        <li>Éviter <code>new/delete</code> manuels; préférer STL/RAII</li>
+        <li>Soigner <code>const</code> pour éviter les copies et effets indésirables</li>
+        <li>Ne pas retourner des références vers des locaux (dangereux)</li>
+      </ul>
+    </div>
+
+    <!-- Slide 20: Mini‑quiz & pratique -->
+    <div class="slide">
+      <h2>Mini‑quiz & pratique</h2>
+      <ul>
+        <li>Quand choisir <code>T*</code> plutôt que <code>T&amp;</code> ?</li>
+        <li>Que vaut <code>*(&amp;x)</code> ? Et <code>&amp;(*p)</code> si <code>p != nullptr</code> ?</li>
+        <li>Écrire <code>bool find(const int* t, int n, int v, int&amp; idx)</code> (réf sortie)</li>
+        <li>Compiler: <code>clang++ -std=c++17 main.cpp -O2 -o app &amp;&amp; ./app</code></li>
+      </ul>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+      <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">20</span></span>
+      <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+    </div>
+  </div>
+
+  <script src="assets/js/cpp_intro.js"></script>
+  </body>
+  </html>
+

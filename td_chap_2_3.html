@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TD — Chapitres 2–3 (Algo, Logique, Fonctions)</title>
+    <link rel="stylesheet" href="assets/css/cpp_intro.css">
+    <meta name="description"
+          content="10 exercices clairs et progressifs (≈2h) couvrant bases C++ (chapitre 2) et fonctions/références (chapitre 3).">
+    <meta name="robots" content="noindex">
+    <meta name="author" content="Cours C++ L2">
+    <meta name="theme-color" content="#667eea">
+    <meta name="language" content="fr">
+    <meta name="course" content="L2 C++ Chapitres 2–3">
+</head>
+<body>
+<div class="presentation-container">
+    <a class="back-link" href="index.html">← Retour au menu</a>
+
+    <!-- Slide 1: Titre -->
+    <div class="slide active title-slide">
+        <h1>TD — Chapitres 2–3</h1>
+        <p class="subtitle">10 exercices clairs et progressifs (≈ 2h)</p>
+    </div>
+
+    <!-- Slide 2: Consignes -->
+    <div class="slide">
+        <h2>Consignes générales</h2>
+        <ul>
+            <li>Niveau: L2. Objectifs: rigueur, logique, propreté du code.</li>
+            <li>Difficulté croissante (1 → 10). Temps total visé ≈ 2h.</li>
+            <li>Compiler C++17. Ex: <code>clang++ -std=c++17 -O2 main.cpp -o app</code></li>
+            <li>Respecter les signatures demandées. Utiliser <code>const</code> et références quand pertinent.</li>
+            <li>Écrire un <code>main()</code> minimal pour tester; garder des entrées simples (stdin).</li>
+        </ul>
+        <div class="info-box"><strong>Évaluation suggérée:</strong> 60% exactitude, 20% qualité (noms,
+            <code>const</code>, structure), 20% cas limites/tests.
+        </div>
+    </div>
+
+    <!-- Exercice 1 -->
+    <div class="slide">
+        <h2>Exercice 1 — Note → Lettre (bornes claires)</h2>
+        <p>Compétences: conditions, gestion des bornes, double.</p>
+        <p>Écrire une fonction qui mappe une note sur 20 vers une lettre.</p>
+        <ul>
+            <li>Règles: A si 16 ≤ n ≤ 20 ; B si 14 ≤ n &lt; 16 ; C si 12 ≤ n &lt; 14 ; D si 10 ≤ n &lt; 12 ; E si 0 ≤ n
+                &lt; 10.
+            </li>
+            <li>Hors intervalle [0,20] → retourner '?' (et l’afficher comme « Erreur » dans votre <code>main</code>).
+            </li>
+        </ul>
+        <div class="code-example"><pre>// Signature attendue
+char grade_from_20(double note);
+
+// Exemples
+// 16   → 'A'
+// 15.9 → 'B'
+// 9.99 → 'E'
+// 21   → '?'
+</pre>
+        </div>
+        <div class="info-box">
+            Étapes suggérées: (1) Vérifier l’intervalle [0,20]. (2) Tester de la borne la plus élevée vers la plus basse
+            pour éviter les chevauchements. (3) Bien respecter inclusif/exclusif. Cas limites à tester: 0, 9.999, 10, 12,
+            14, 16, 20.
+        </div>
+    </div>
+
+    <!-- Exercice 2 -->
+    <div class="slide">
+        <h2>Exercice 2 — Mini‑calculatrice (4 opérations)</h2>
+        <p>Compétences: <code>switch</code>, paramètre par référence, gestion des erreurs simple.</p>
+        <p>Écrire une fonction qui évalue une expression de la forme <code>a op b</code> où <code>op</code> est l’un des caractères <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>.</p>
+        <ul>
+            <li>Si <code>op</code> est inconnu ou s’il s’agit d’une division par zéro, retourner <code>false</code>.</li>
+            <li>Sinon, écrire le résultat dans le paramètre de sortie (référence) et retourner <code>true</code>.</li>
+            <li>Entrées et sorties réelles (type <code>double</code>).</li>
+        </ul>
+        <div class="code-example"><pre>// Signature attendue
+bool calculer(double a, char op, double b, double&amp; out);
+
+// Programme de test (exemple minimal)
+// Lecture au format: a op b  (ex.: 3 + 4)
+/*
+int main(){
+    double a, b; char op;
+    if (std::cin &gt;&gt; a &gt;&gt; op &gt;&gt; b) {
+        double r;
+        if (calculer(a, op, b, r)) std::cout &lt;&lt; r &lt;&lt; "\n";
+        else std::cout &lt;&lt; "Erreur\n";
+    }
+}
+*/
+
+// Exemples d'E/S
+// Entrée: 3 + 4    → Sortie: 7
+// Entrée: 10 / 2   → Sortie: 5
+// Entrée: 5 / 0    → Sortie: Erreur
+// Entrée: 2 x 3    → Sortie: Erreur
+</pre>
+        </div>
+        <div class="info-box">Durée cible: 8–10 min. Indice: utilisez <code>switch(op)</code> et vérifiez <code>b != 0</code> avant la division.</div>
+    </div>
+
+    <!-- Exercice 3 -->
+    <div class="slide">
+        <h2>Exercice 3 — Classifier une suite (détaillé)</h2>
+        <p>Compétences: boucles, drapeaux logiques, cas limites, définitions rigoureuses.</p>
+        <p>Écrire une fonction qui classe un tableau dans l’une des catégories suivantes:</p>
+        <ul>
+            <li><strong>CONSTANTE</strong> : tous les éléments sont égaux.</li>
+            <li><strong>STRICT_INC</strong> : pour tout i, <code>t[i] &lt; t[i+1]</code>.</li>
+            <li><strong>NON_DEC</strong> : pour tout i, <code>t[i] ≤ t[i+1]</code>, et la suite n’est pas STRICT_INC (il y a au moins une égalité).</li>
+            <li><strong>STRICT_DEC</strong> : pour tout i, <code>t[i] &gt; t[i+1]</code>.</li>
+            <li><strong>NON_INC</strong> : pour tout i, <code>t[i] ≥ t[i+1]</code>, et la suite n’est pas STRICT_DEC.</li>
+            <li><strong>AUCUNE</strong> : ne vérifie aucune des propriétés ci‑dessus.</li>
+        </ul>
+        <div class="code-example"><pre>// Signature attendue
+// Retourne une chaîne littérale (pointeur vers texte constant)
+const char* classify(const int t[], int n);
+
+// Contraintes
+// - Complexité O(n)
+// - Ne pas modifier le tableau
+// - Par convention, n = 0 ou n = 1 → "CONSTANTE"
+
+// Étapes suggérées
+// bool has_lt = false, has_gt = false, has_eq = false;
+// pour i=0..n-2:
+//   if (t[i] < t[i+1]) has_lt = true;
+//   else if (t[i] > t[i+1]) has_gt = true;
+//   else has_eq = true;
+// Décision:
+//   si has_lt==false && has_gt==false → CONSTANTE
+//   sinon si has_lt && !has_gt && !has_eq → STRICT_INC
+//   sinon si has_lt && !has_gt && has_eq → NON_DEC
+//   sinon si has_gt && !has_lt && !has_eq → STRICT_DEC
+//   sinon si has_gt && !has_lt && has_eq → NON_INC
+//   sinon → AUCUNE
+
+// Exemples
+// [1,1,1]        → CONSTANTE
+// [1,2,3]        → STRICT_INC
+// [1,2,2,3]      → NON_DEC
+// [3,2,1]        → STRICT_DEC
+// [3,3,2,2]      → NON_INC
+// [1,3,2]        → AUCUNE
+</pre></div>
+        <div class="info-box">Durée cible: 12 min. Attention à bien distinguer NON_DEC de STRICT_INC (présence d’au moins une égalité).</div>
+    </div>
+
+    <!-- Exercice 4 -->
+    <div class="slide">
+        <h2>Exercice 4 — Deux indices qui font la somme</h2>
+        <p>Compétences: logique, références, complexité.</p>
+        <p>Écrire une fonction qui cherche deux indices <code>i &lt; j</code> tels que <code>t[i] + t[j] == cible</code>, puis les retourne via des références.</p>
+        <div class="code-example"><pre>// Signature attendue
+bool two_sum(const int t[], int n, int cible, int&amp; i, int&amp; j);
+
+// Règles et contraintes
+// - Si une paire existe, retourner true et écrire i, j avec i < j.
+// - Sinon, retourner false (ne pas utiliser i/j ensuite).
+// - NE PAS modifier le tableau t.
+// - n peut être &lt; 2 : dans ce cas, il n'existe pas de paire.
+// - Les valeurs peuvent être négatives, nulles ou positives.
+// - Déterminisme (si plusieurs paires possibles) : choisir la paire avec i le plus petit;
+//   en cas d'égalité sur i, choisir celle avec j le plus petit (ordre lexicographique).
+
+// Étapes (version simple O(n^2))
+// pour i = 0 .. n-1:
+//   pour j = i+1 .. n-1:
+//     si t[i] + t[j] == cible -> retourner true avec ces indices (première paire rencontrée respecte la règle)
+// fin → retourner false
+
+// Exemples
+// t=[2,7,11,15], cible=9      → true, i=0, j=1   (2+7)
+// t=[1,2,3],       cible=6    → false
+// t=[-3,4,0,5],    cible=2    → true, i=0, j=3   (-3+5)
+// t=[3,3,4],       cible=6    → true, i=0, j=1   (duplications autorisées)
+</pre></div>
+        <div class="code-example"><pre>// Programme de test (exemple minimal)
+/*
+#include &lt;iostream&gt;
+bool two_sum(const int t[], int n, int cible, int&amp; i, int&amp; j) {
+    if (n &lt; 2) return false;
+    for (int a = 0; a &lt; n; ++a) {
+        for (int b = a + 1; b &lt; n; ++b) {
+            if (t[a] + t[b] == cible) { i = a; j = b; return true; }
+        }
+    }
+    return false;
+}
+
+int main(){
+    int n; std::cin &gt;&gt; n; // ex.: 5
+    int t[1000];
+    for (int k=0; k&lt;n; ++k) std::cin &gt;&gt; t[k]; // ex.: 2 7 11 15 1
+    int cible; std::cin &gt;&gt; cible;            // ex.: 9
+    int i, j;
+    if (two_sum(t, n, cible, i, j)) std::cout &lt;&lt; i &lt;&lt; " " &lt;&lt; j &lt;&lt; "\n";
+    else std::cout &lt;&lt; "Aucune paire" &lt;&lt; "\n";
+}
+*/
+
+// Jeux de tests conseillés
+// 1) n=0 ou n=1 → false
+// 2) négatifs:  [-3,4,0,5], cible=2 → (0,3)
+// 3) doublons:  [3,3],     cible=6 → (0,1)
+// 4) aucun cas: [1,2,3],   cible=0 → false
+</pre></div>
+        <div class="info-box">Durée cible: 12–14 min. Pièges: bien imposer j &gt; i, ne pas sortir des bornes, ne pas modifier le tableau.</div>
+    </div>
+
+    <!-- Exercice 5 -->
+    <div class="slide">
+        <h2>Exercice 5 — Supprimer les doublons consécutifs (in‑place)</h2>
+        <p>Compétences: tableaux, indices, écriture en place, cas limites.</p>
+        <p>Écrire une fonction qui supprime les <strong>doublons consécutifs</strong> d’un tableau d’entiers. On ne garde que le premier élément de chaque groupe identique consécutif.</p>
+        <div class="code-example"><pre>// Signature attendue
+// Retourne la nouvelle taille logique du tableau après compactage.
+int unique_compact(int t[], int n);
+
+// Règles et contraintes
+// - Complexité O(n), un seul passage.
+// - In-place: écrire les éléments gardés au début du tableau; le reste (après la nouvelle taille) est indéfini.
+// - Ne considérer que les doublons consécutifs. Si les mêmes valeurs réapparaissent plus loin, on les garde.
+// - Ne pas allouer de nouveau tableau.
+
+// Étapes suggérées
+// - Si n == 0 → retourner 0.
+// - Poser write = 1.
+// - Pour i de 1 à n-1:
+//     si t[i] != t[write-1] alors t[write] = t[i], puis ++write
+// - Retourner write.
+
+// Exemples
+// [1,1,2,2,2,3,1,1] → après: [1,2,3,1, ...], retourne 4
+// [5,5,5]           → après: [5, ...],      retourne 1
+// [1,2,3]           → après: [1,2,3],       retourne 3
+// []                → retourne 0
+
+// Programme de test (exemple minimal)
+/*
+#include &lt;iostream&gt;
+int unique_compact(int t[], int n){
+    if (n == 0) return 0;
+    int write = 1;
+    for (int i = 1; i < n; ++i) {
+        if (t[i] != t[write - 1]) t[write++] = t[i];
+    }
+    return write;
+}
+
+int main(){
+    int t[] = {1,1,2,2,2,3,1,1}; int n = 8;
+    int m = unique_compact(t, n);
+    std::cout << m << "\n";            // attendu: 4
+    for (int k=0; k<m; ++k) std::cout << t[k] << ' '; // 1 2 3 1
+}
+*/
+
+// Jeux de tests conseillés
+// - n = 0 ; n = 1
+// - Tous identiques ; tous distincts
+// - Longues séries au début/au milieu/à la fin
+</pre></div>
+        <div class="info-box">Durée cible: 10–12 min. Bien réfléchir à la comparaison avec l'élément précédent gardé (index write-1).</div>
+    </div>
+
+    <!-- Exercice 6 -->
+    <div class="slide">
+        <h2>Exercice 6 — Palindrome (ignorer casse et ponctuation)</h2>
+        <p>Compétences: chaînes, <code>const&amp;</code>, <code>std::isalnum</code>/<code>std::tolower</code>.</p>
+        <p>Vérifier si une chaîne est un palindrome en ignorant espaces, ponctuation et casse (ASCII).</p>
+        <div class="code-example"><pre>// Signature attendue
+bool palindrome(const std::string&amp; s);
+
+// Contraintes
+// - Ne pas créer de copie de la chaîne complète
+// - Utiliser deux indices i (début) et j (fin)
+// - Ignorer les caractères non alphanumériques
+
+// Étapes suggérées
+// i=0; j=s.size()-1;
+// tant que i&lt;j:
+//   avancer i jusqu'à alnum, reculer j jusqu'à alnum
+//   comparer tolower(s[i]) et tolower(s[j])
+//   si différents → false; sinon i++, j--
+// fin → true
+
+// Exemples
+// "Engage le jeu que je le gagne" → true
+// "Hello, World!"                 → false
+</pre></div>
+        <div class="info-box">Durée cible: 10 min. Toujours caster en <code>(unsigned char)</code> avant <code>std::tolower</code> et <code>std::isalnum</code>.</div>
+    </div>
+
+    <!-- Exercice 7 -->
+    <div class="slide">
+        <h2>Exercice 7 — Encodage RLE (A–Z uniquement)</h2>
+        <p>Compétences: parcours, comptage, construction de chaîne.</p>
+        <p>Encoder une chaîne en run‑length: <code>AAABB → A3B2</code>. Entrée restreinte à <code>A</code>–<code>Z</code>.</p>
+        <div class="code-example"><pre>// Signature attendue
+std::string rle_encode(const std::string&amp; s);
+
+// Étapes suggérées
+// - Si s est vide → retourner ""
+// - Parcourir s en comptant les répétitions consécutives du même caractère
+// - Ajouter au résultat: le caractère suivi du nombre (toujours affiché)
+
+// Exemples
+// "AAABBCCDAA" → "A3B2C2D1A2"
+// "A"          → "A1"
+// ""           → ""
+
+// Bonus (optionnel): rle_decode.
+</pre></div>
+        <div class="info-box">Durée cible: 8 min. Ne pas oublier d’ajouter le dernier groupe après la boucle.</div>
+    </div>
+
+    <!-- Exercice 8 -->
+    <div class="slide">
+        <h2>Exercice 8 — Point selle (matrice)</h2>
+        <p>Compétences: tableaux 2D, min/ max, indices.</p>
+        <p>Un point selle est un élément qui est le <strong>minimum de sa ligne</strong> et le <strong>maximum de sa colonne</strong>.</p>
+        <div class="code-example"><pre>// Contrainte C++: la 2e dimension doit être connue à la compilation
+const int MAXC = 50;
+bool saddle_point(const int M[][MAXC], int rows, int cols, int&amp; r, int&amp; c);
+
+// Méthode
+// - Pour chaque ligne i, trouver le(s) indice(s) j où M[i][j] est minimal dans la ligne i.
+// - Pour chaque candidat (i,j), vérifier que M[i][j] est ≥ à tous les éléments de la colonne j.
+// - Si oui, retourner true et (r=i,c=j). Sinon, continuer.
+
+// Exemple correct
+// M =
+//  3  1  3
+//  3  2  4
+//  2  2  2
+// → Le (2,0) (=2) est min de la ligne 2 et max de sa colonne 0 (col0: 3,3,2 → max=3, donc 2 n'est pas max). Pas de point selle ici.
+// Testez d'autres matrices pour trouver un vrai point selle (ex.:
+//  1  10  7
+//  4  3   2
+//  9  8   6  → (r=1,c=1) = 3 est min de la ligne 1 et max de la colonne 1?)
+
+// Retourne true si trouvé et écrit (r,c), sinon false.
+</pre></div>
+        <div class="info-box">Durée cible: 12–14 min. Complexité simple: O(rows×cols). Vérifier soigneusement la définition.</div>
+    </div>
+
+    <!-- Exercice 9 -->
+    <div class="slide">
+        <h2>Exercice 9 — Surcharge + paramètres par défaut (clip)</h2>
+        <p>Compétences: surcharge, valeurs par défaut, références.</p>
+        <p>Écrire des fonctions qui « bornent » une valeur dans l’intervalle <code>[min, max]</code> (bornes incluses).</p>
+        <div class="code-example"><pre>// Signatures attendues (dans un .hpp — valeurs par défaut UNIQUEMENT ici)
+int    clip(int x, int min = 0,   int max = 100);
+double clip(double x, double min = 0.0, double max = 100.0);
+void   clamp_inplace(int&amp; x, int min = 0, int max = 100); // modifie x
+
+// Règles et contraintes
+// - Précondition: min ≤ max (pas besoin de le corriger automatiquement).
+// - Les valeurs par défaut ne DOIVENT PAS apparaître dans la définition (.cpp).
+// - Bornes inclusives: si x=min → x ; si x=max → x.
+// - Surcharge: même nom clip pour int et double (types différents).
+
+// Étapes détaillées
+// clip (version int/double):
+//   si x &lt; min → retourner min
+//   sinon si x &gt; max → retourner max
+//   sinon → retourner x (inchangé)
+// clamp_inplace:
+//   appliquer la même logique, mais écrire le résultat dans x (par référence) et ne rien retourner.
+
+// Exemples
+// clip(120)            → 100
+// clip(-5)             → 0
+// clip(42, 10, 50)     → 42
+// clip(10, 10, 50)     → 10 (borne incluse)
+// clip(50, 10, 50)     → 50 (borne incluse)
+// clamp_inplace(x=-3)  → x devient 0
+// clamp_inplace(x=77)  → x devient 77
+        </pre></div>
+        <div class="code-example"><pre>// Exemple d'en‑tête et d'implémentation corrects
+// clip.hpp
+#pragma once
+int    clip(int x, int min = 0, int max = 100);
+double clip(double x, double min = 0.0, double max = 100.0);
+void   clamp_inplace(int&amp; x, int min = 0, int max = 100);
+
+// clip.cpp (SANS valeurs par défaut ici)
+#include "clip.hpp"
+int clip(int x, int min, int max) {
+    if (x &lt; min) return min;
+    if (x &gt; max) return max;
+    return x;
+}
+double clip(double x, double min, double max) {
+    if (x &lt; min) return min;
+    if (x &gt; max) return max;
+    return x;
+}
+void clamp_inplace(int&amp; x, int min, int max) {
+    if (x &lt; min) x = min;
+    else if (x &gt; max) x = max;
+}
+        </pre></div>
+        <div class="code-example"><pre>// Programme de test minimal
+/*
+#include &lt;iostream&gt;
+#include "clip.hpp"
+int main(){
+    std::cout &lt;&lt; clip(120) &lt;&lt; "\n";           // 100
+    std::cout &lt;&lt; clip(-5)  &lt;&lt; "\n";           // 0
+    std::cout &lt;&lt; clip(42, 10, 50) &lt;&lt; "\n";      // 42
+    double d = clip(12.7, 0.0, 10.0);           // 10.0
+    int x = -3; clamp_inplace(x); std::cout &lt;&lt; x &lt;&lt; "\n"; // 0
+}
+*/
+        </pre></div>
+        <div class="info-box"><strong>Pièges fréquents :</strong> 1) répéter les valeurs par défaut dans le .cpp (à éviter) ; 2) mettre des valeurs par défaut sur des paramètres qui ne sont pas en fin de liste ; 3) mélanger les types (ex.: appeler clip(double) avec des entiers sans suffixes peut choisir la version int — utilisez des suffixes clairs si besoin).</div>
+    </div>
+
+    <!-- Exercice 10 -->
+    <div class="slide">
+        <h2>Exercice 10 — Mini‑lib tableau (fichiers séparés)</h2>
+        <p>Compétences: <code>.hpp/.cpp</code>, <code>const</code>, références, recherche.</p>
+        <p>Créer <code>array_utils.hpp/.cpp</code> avec 4 fonctions utiles, puis un <code>main.cpp</code> de démonstration. Séparer proprement déclarations (header) et définitions (source).</p>
+        <div class="code-example"><pre>// array_utils.hpp (déclarations uniquement)
+#pragma once
+
+// 1) Vérifie si t est trié non décroissant (t[i] ≤ t[i+1]).
+//    Complexité O(n). Ne modifie pas t. Pour n &lt;= 1, retourner true.
+bool is_sorted_non_decreasing(const int t[], int n);
+
+// 2) Échange deux entiers par référence. O(1).
+void swap_ref(int&amp; a, int&amp; b);
+
+// 3) Inverse t en place. O(n). Peut utiliser swap_ref.
+void reverse_inplace(int t[], int n);
+
+// 4) Recherche dichotomique (tableau supposé trié non décroissant):
+//    Retourne le plus petit index i tel que t[i] ≥ cible. Si aucun, retourne n.
+//    Complexité O(log n). Ne modifie pas t.
+int lower_bound(const int t[], int n, int cible);
+
+// Contraintes header
+// - AUCUN "using namespace std;" ici.
+// - Respecter la const-correctness pour les fonctions lecture seule.
+        </pre></div>
+        <div class="code-example"><pre>// array_utils.cpp (définitions)
+#include "array_utils.hpp"
+
+bool is_sorted_non_decreasing(const int t[], int n) {
+    for (int i = 0; i + 1 &lt; n; ++i) {
+        if (t[i] &gt; t[i + 1]) return false;
+    }
+    return true; // vrai pour n==0 ou n==1
+}
+
+void swap_ref(int&amp; a, int&amp; b) {
+    int tmp = a; a = b; b = tmp;
+}
+
+void reverse_inplace(int t[], int n) {
+    for (int i = 0, j = n - 1; i &lt; j; ++i, --j) {
+        swap_ref(t[i], t[j]);
+    }
+}
+
+int lower_bound(const int t[], int n, int cible) {
+    int g = 0, d = n; // intervalle [g, d)
+    while (g &lt; d) {
+        int m = g + (d - g) / 2;
+        if (t[m] &gt;= cible) {
+            d = m;     // candidate position à gauche (inclut m)
+        } else {
+            g = m + 1; // chercher strictement à droite
+        }
+    }
+    return g; // = n si aucune valeur ≥ cible
+}
+        </pre></div>
+        <div class="code-example"><pre>// main.cpp (exemple d'utilisation minimal)
+/*
+#include &lt;iostream&gt;
+#include "array_utils.hpp"
+
+int main(){
+    int n; std::cin &gt;&gt; n; // ex.: 5
+    int t[1000];
+    for (int i=0;i&lt;n;++i) std::cin &gt;&gt; t[i]; // ex.: 1 2 2 5 9
+
+    std::cout &lt;&lt; (is_sorted_non_decreasing(t,n) ? "TRIE" : "PAS_TRIE") &lt;&lt; "\n";
+
+    // Démo reverse
+    reverse_inplace(t, n);
+    for (int i=0;i&lt;n;++i) std::cout &lt;&lt; t[i] &lt;&lt; ' ';
+    std::cout &lt;&lt; "\n";
+
+    // Re-trier manuellement pour la démo (ex: entrée déjà triée à la base)
+    // Puis tester lower_bound sur quelques cibles
+    int cibles[] = {0, 2, 6, 10};
+    for (int c : cibles) {
+        std::cout &lt;&lt; "lb(" &lt;&lt; c &lt;&lt; ")=" &lt;&lt; lower_bound(t, n, c) &lt;&lt; "\n";
+    }
+}
+*/
+
+// Compilation
+// clang++ -std=c++17 main.cpp array_utils.cpp -O2 -o app &amp;&amp; ./app
+        </pre></div>
+        <div class="info-box"><strong>Détails & pièges :</strong> 1) lower_bound: bien retourner n si aucune valeur ≥ cible (et non -1) ; 2) bornes du binaire: utiliser l’intervalle [g,d) évite les boucles infinies ; 3) reverse_inplace: attention aux indices i/j (i&lt;j) ; 4) pas de "using namespace std;" dans les headers ; 5) estimer les complexités: O(n) vs O(log n).</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+        <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">12</span></span>
+        <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+    </div>
+</div>
+
+<script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

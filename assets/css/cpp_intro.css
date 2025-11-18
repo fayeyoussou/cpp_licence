@@ -125,6 +125,16 @@ button:disabled {
     transform: none;
 }
 
+.explain-btn {
+    margin-top: 15px;
+    background: #ff914d;
+    display: inline-block;
+}
+
+.explain-btn:hover {
+    background: #ff6f1e;
+}
+
 .slide-number {
     color: #666;
     font-weight: 600;

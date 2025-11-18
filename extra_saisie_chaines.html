@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Extra — Saisie clavier, chaînes C et fonctions utilitaires</title>
+    <link rel="stylesheet" href="assets/css/cpp_intro.css" />
+    <meta name="description" content="Complément sur la saisie clavier en C++, comparaison getch/cin, chaînes de caractères en C, conversions, exercices pratiques et explications." />
+</head>
+<body>
+    <div class="presentation-container">
+        <a class="back-link" href="index.html">← Retour au menu</a>
+
+        <div class="slide active title-slide">
+            <h1>Extra — Saisie clavier &amp; chaînes de caractères</h1>
+            <p class="subtitle">20 slides de cours + 20 slides d&#39;exemples (10 couples code/explication)</p>
+        </div>
+
+        <div class="slide">
+            <h2>Pourquoi ce complément ?</h2>
+            <ul>
+                <li>Comprendre précisément le comportement de <code>std::cin</code></li>
+                <li>Savoir quand utiliser les fonctions historiques (<code>getch</code>, <code>conio.h</code>)</li>
+                <li>Maîtriser les chaînes style C et leurs fonctions utilitaires</li>
+                <li>Disposer d&#39;exercices concrets pour vos étudiants</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Flux standard (rappel)</h2>
+            <ul>
+                <li><code>std::cin</code> (entrée), <code>std::cout</code> (sortie), <code>std::cerr</code> (erreurs)</li>
+                <li>Inclure <code>&lt;iostream&gt;</code> et qualifier les symboles avec <code>std::</code></li>
+                <li>Les flux conservent un état : ok, fin de fichier, erreur</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2><code>cin</code> et la lecture formatée</h2>
+            <div class="code-example"><pre>char c; int i; float r;
+std::cin &amp;gt;&amp;gt; c;
+std::cin &amp;gt;&amp;gt; i;
+std::cin &amp;gt;&amp;gt; r;</pre></div>
+            <ul>
+                <li>Les séparateurs (espace, tab, retour chariot) arrêtent la lecture</li>
+                <li>Un type inattendu laisse le flux en erreur</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Récupérer après une erreur</h2>
+            <div class="code-example"><pre>if (!(std::cin &amp;gt;&amp;gt; i)) {
+    std::cin.clear();
+    std::cin.ignore(1000, '\n');
+    std::cout &amp;lt;&amp;lt; "Entrée invalide";
+}</pre></div>
+            <ul>
+                <li><code>clear()</code>: remet le flux en état « ok »</li>
+                <li><code>ignore()</code>: ignore les caractères restants jusqu&#39;à <code>\n</code></li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2><code>getch()</code> (conio.h)</h2>
+            <ul>
+                <li>Lit immédiatement un caractère sans attendre ENTER</li>
+                <li>Aucun écho écran : il faut afficher manuellement</li>
+                <li>Non standard (principalement Windows/DOS)</li>
+            </ul>
+            <div class="code-example"><pre>char alpha = getch();
+std::cout &amp;lt;&amp;lt; "Vous avez tapé: " &amp;lt;&amp;lt; alpha;</pre></div>
+        </div>
+
+        <div class="slide">
+            <h2><code>getche()</code> et comparaison avec <code>cin</code></h2>
+            <ul>
+                <li><code>getche()</code> (conio.h) lit un caractère et l&#39;affiche immédiatement (utile pour les menus console)</li>
+                <li><code>std::cin</code> attend ENTER et gère nativement tous les types, mais affiche toujours ce que tape l&#39;utilisateur</li>
+                <li>Portabilité : <code>cin</code> est standard, <code>getch/getche</code> ne sont pas disponibles partout → prévoir un plan B</li>
+                <li>Pour masquer un mot de passe, utiliser <code>getch()</code> + affichage personnalisé, ou des API spécifiques selon l&#39;OS</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2><code>std::getline</code> vs extraction</h2>
+            <div class="code-example"><pre>char ligne[64];
+std::cin.getline(ligne, 64);
+std::string texte;
+std::getline(std::cin, texte);
+</pre></div>
+            <ul>
+                <li><code>getline</code> lit jusqu&#39;au retour chariot (espaces inclus)</li>
+                <li>Penser à vider le buffer avant un <code>getline</code> si une extraction (<code>&gt;&gt;</code>) vient d&#39;avoir lieu</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2><code>std::string</code> ou <code>char[]</code> ?</h2>
+            <ul>
+                <li><code>std::string</code> gère la taille et la mémoire automatiquement</li>
+                <li><code>char[]</code> est utile pour comprendre la représentation bas niveau</li>
+                <li>Choisissez <code>std::string</code> pour les projets modernes, <code>char[]</code> pour l&#39;apprentissage ou l&#39;interop C</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Chaînes de caractères style C</h2>
+            <div class="code-example"><pre>char texte[20] = "BONJOUR";
+texte[7] = '\0'; // déjà ajouté automatiquement
+</pre></div>
+            <ul>
+                <li>La chaîne se termine toujours par <code>'\0'</code></li>
+                <li>Un débordement (chaîne trop longue) écrase la mémoire voisine</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Afficher et lire une chaîne</h2>
+            <div class="code-example"><pre>char texte[20];
+std::cout &amp;lt;&amp;lt; "Entrez un mot: ";
+std::cin &amp;gt;&amp;gt; texte;
+std::cout &amp;lt;&amp;lt; texte;
+</pre></div>
+            <ul>
+                <li>L&#39;extraction classique s&#39;arrête au premier espace</li>
+                <li>Utiliser <code>getline</code> pour lire une phrase complète</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Fonctions &lt;cstring&gt;</h2>
+            <ul>
+                <li><code>strlen</code> : longueur</li>
+                <li><code>strcpy</code>/<code>strncpy</code> : copie</li>
+                <li><code>strcat</code>/<code>strncat</code> : concaténation</li>
+                <li><code>strcmp</code> : comparaison lexicographique</li>
+            </ul>
+            <div class="info-box">Les versions <code>strn*</code> limitent le nombre de caractères copiés.</div>
+        </div>
+
+        <div class="slide">
+            <h2>Recherche dans une chaîne</h2>
+            <ul>
+                <li><code>strchr</code> : position du premier caractère donné</li>
+                <li><code>strrchr</code> : même chose depuis la fin</li>
+                <li><code>strstr</code> : emplacement d&#39;une sous-chaîne</li>
+            </ul>
+            <div class="code-example"><pre>if (strchr(texte, 'A')) std::cout &amp;lt;&amp;lt; "A trouvé";</pre></div>
+        </div>
+
+        <div class="slide">
+            <h2>Conversions avec &lt;cstdlib&gt;</h2>
+            <ul>
+                <li><code>atoi</code>/<code>atol</code>/<code>atof</code> : texte → entier/flottant</li>
+                <li><code>itoa</code>, <code>ltoa</code> (non standard) : entier → texte</li>
+                <li><code>std::stoi</code>/<code>std::stof</code> : alternatives modernes qui gèrent les erreurs</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Valider une entrée numérique</h2>
+            <div class="code-example"><pre>bool entier_valide(const char* t) {
+    if (!*t) return false;
+    while (*t) {
+        if (!std::isdigit(*t)) return false;
+        ++t;
+    }
+    return true;
+}</pre></div>
+            <ul>
+                <li>Permet de vérifier avant d&#39;appeler <code>atoi</code></li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Saisie multi-mots</h2>
+            <ul>
+                <li>Après un <code>cin &gt;&gt;</code>, pensez à consommer le <code>\n</code> restant</li>
+                <li><code>std::cin.ignore(std::numeric_limits&lt;std::streamsize&gt;::max(), '\n');</code></li>
+                <li>Ensuite, <code>std::getline</code> récupère toute la ligne</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Affichage caractère par caractère</h2>
+            <div class="code-example"><pre>for (int i = 0; texte[i]; ++i) {
+    std::cout &amp;lt;&amp;lt; i &lt;&lt; ": " &lt;&lt; int(texte[i]) &lt;&lt; '\n';
+}</pre></div>
+            <ul>
+                <li>Pratique pour montrer le code ASCII aux étudiants</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Exercices « niveau I »</h2>
+            <ul>
+                <li>II_1 : lire un caractère, afficher son code ASCII</li>
+                <li>II_2 : participation aux votes (I, V, pourcentage, majorité)</li>
+                <li>II_3 : moyenne de trois réels</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Exercices « niveau II »</h2>
+            <ul>
+                <li>VI_5 : afficher une chaîne caractère par caractère</li>
+                <li>VI_6 : compter le nombre de lettres <code>e</code></li>
+                <li>VI_7 : vérifier l&#39;extension <code>.PAS</code></li>
+                <li>VI_8 : parser une chaîne de mesures numériques</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Bonnes pratiques IHM</h2>
+            <ul>
+                <li>Afficher un message clair sur ce qui est attendu</li>
+                <li>Vérifier les entrées avant conversion</li>
+                <li>Ne pas se fier à <code>cin</code> seul pour une IHM finale → préférer une couche de validation</li>
+            </ul>
+        </div>
+
+        <!-- Exemples pratiques (slides 21 à 40) -->
+
+        <div class="slide">
+            <h2>Exemple 1 — Code ASCII</h2>
+            <div class="code-example"><pre>int main() {
+    char c;
+    std::cout &amp;lt;&amp;lt; "Caractère: ";
+    std::cin &amp;gt;&amp;gt; c;
+    int code = c;
+    std::cout &amp;lt;&amp;lt; code;
+}</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 1 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// cin lit un char, l'assignation implicite vers int donne le code ASCII
+// Entrée: 'A' → code = 65
+std::cout &amp;lt;&amp;lt; 65;</pre></div>
+            <p>Résultat pour « A » : <strong>65</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 2 — Participation électorale</h2>
+            <div class="code-example"><pre>int main() {
+    int I, V;
+    std::cin &amp;gt;&amp;gt; I &amp;gt;&amp;gt; V;
+    int P = V * 100 / I;
+    int M = V / 2 + 1;
+    std::cout &amp;lt;&amp;lt; P &amp;lt;&amp;lt; "% " &amp;lt;&amp;lt; M;
+}</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 2 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// I = inscrits, V = votants
+// P = (V*100)/I (entier), M = V/2 + 1
+// Entrée: 100 62 → P=62, M=32
+std::cout &amp;lt;&amp;lt; "62% 32";</pre></div>
+            <p>Résultat : <strong>62% 32</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 3 — Moyenne de trois réels</h2>
+            <div class="code-example"><pre>int main() {
+    float a, b, c;
+    std::cin &amp;gt;&amp;gt; a &amp;gt;&amp;gt; b &amp;gt;&amp;gt; c;
+    float m = (a + b + c) / 3.0f;
+    std::cout &amp;lt;&amp;lt; m;
+}</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 3 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Lecture séquentielle de trois flottants
+// Entrée: 10 12 14 → moyenne = 12
+std::cout &amp;lt;&amp;lt; "12";</pre></div>
+            <p>Résultat : <strong>12</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 4 — Afficher chaque caractère</h2>
+            <div class="code-example"><pre>char texte[30];
+std::cin &amp;gt;&amp;gt; texte;
+for (int i = 0; texte[i]; ++i)
+    std::cout &amp;lt;&amp;lt; texte[i] &lt;&lt; "\n";
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 4 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// La boucle s'arrête sur '\0'
+// Entrée: "BONJOUR"
+// Sortie: chaque lettre sur une ligne</pre></div>
+            <p>Résultat : B (ligne 1), O (ligne 2), etc.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 5 — Compter les lettres e</h2>
+            <div class="code-example"><pre>char texte[40];
+std::cin &amp;gt;&amp;gt; texte;
+int count = 0;
+for (int i = 0; texte[i]; ++i)
+    if (texte[i] == 'e' || texte[i] == 'E') ++count;
+std::cout &amp;lt;&amp;lt; count;
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 5 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Entrée: "exemple" → e/E = 3
+std::cout &amp;lt;&amp;lt; 3;</pre></div>
+            <p>Résultat : <strong>3</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 6 — Vérifier l&#39;extension .PAS</h2>
+            <div class="code-example"><pre>char nom[32];
+std::cin &amp;gt;&amp;gt; nom;
+char* pos = strrchr(nom, '.');
+bool ok = pos &amp;&amp; strcmp(pos, ".PAS") == 0;
+std::cout &amp;lt;&amp;lt; (ok ? "OK" : "Erreur");
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 6 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// strrchr cherche le dernier '.'
+// strcmp compare l'extension restante
+// Entrée: "test.PAS" → OK</pre></div>
+            <p>Résultat : <strong>OK</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 7 — Conversion avec <code>atoi</code></h2>
+            <div class="code-example"><pre>char buf[10];
+std::cin &amp;gt;&amp;gt; buf;
+int valeur = atoi(buf);
+std::cout &amp;lt;&amp;lt; valeur + 1;
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 7 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// "123" devient 123, puis +1 → 124
+std::cout &amp;lt;&amp;lt; 124;</pre></div>
+            <p>Résultat pour « 123 » : <strong>124</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 8 — Pause avec <code>getch</code></h2>
+            <div class="code-example"><pre>std::cout &amp;lt;&amp;lt; "Appuyer";
+getch();
+std::cout &amp;lt;&amp;lt; "Merci";
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 8 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Programme suspendu jusqu'à ce qu'une touche soit pressée
+// L'utilisateur voit: "Appuyer" puis "Merci" après la frappe</pre></div>
+            <p>Résultat : contrôle total sur le moment de reprise.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 9 — Recherche avec <code>strchr</code></h2>
+            <div class="code-example"><pre>char mot[20];
+std::cin &amp;gt;&amp;gt; mot;
+if (strchr(mot, 'A'))
+    std::cout &amp;lt;&amp;lt; "A trouvé";
+else
+    std::cout &amp;lt;&amp;lt; "A absent";
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 9 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// strchr renvoie un pointeur non nul si le caractère existe
+// Entrée: "SALUT" → pointeur trouvé → affiche "A trouvé"</pre></div>
+            <p>Résultat : <strong>A trouvé</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 10 — Parsing des mesures</h2>
+            <div class="code-example"><pre>char mesures[] = "CHANNELA 0 10 -5";
+char* token = std::strtok(mesures, " ");
+while (token) {
+    if (std::isdigit(token[0]) || token[0] == '-')
+        std::cout &amp;lt;&amp;lt; token &lt;&lt; " ";
+    token = std::strtok(nullptr, " ");
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 10 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// strtok découpe la chaîne sur les espaces
+// On n'affiche que les jetons numériques
+// Sortie: "0 10 -5"</pre></div>
+            <p>Résultat : <strong>0 10 -5</strong>.</p>
+        </div>
+
+        <div class="controls">
+            <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+            <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">40</span></span>
+            <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+        </div>
+    </div>
+
+    <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

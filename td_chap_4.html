@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TD — Chapitre 4 (Listes &amp; Vecteurs)</title>
+    <link rel="stylesheet" href="assets/css/cpp_intro.css">
+    <meta name="description" content="Projet guidé autour des listes doublement chaînées, transferts et structures avancées pour le chapitre 4.">
+    <meta name="robots" content="noindex">
+</head>
+<body>
+<div class="presentation-container">
+    <a class="back-link" href="index.html">← Retour au menu</a>
+
+    <div class="slide active title-slide">
+        <h1>TD — Chapitre 4</h1>
+        <p class="subtitle">Projet « Gestion d’employés » (listes &amp; transférer)</p>
+    </div>
+
+    <div class="slide">
+        <h2>Contexte &amp; objectifs</h2>
+        <ul>
+            <li>Niveau L2. On suppose acquis les chapitres 2–3 (types, pointeurs, fonctions, références).</li>
+            <li>But: manipuler une liste doublement chaînée, un menu interactif et un transfert vers une liste simple.</li>
+            <li>Travail individuel ou binôme. Compiler en C++17, contrôler les fuites mémoire.</li>
+            <li>Fichier unique conseillé (<code>td4.cpp</code>) séparé en sections (structures, prototypes, fonctions, <code>main</code>).</li>
+        </ul>
+    </div>
+
+    <div class="slide">
+        <h2>Structure employé</h2>
+        <p>Chaque employé possède : <strong>id</strong> (int), <strong>nom</strong>, <strong>prénom</strong> (<code>std::string</code>) et un <strong>service</strong>.</p>
+        <div class="code-example"><pre>enum class Service { RH, MAINTENANCE, INFORMATIQUE };
+
+struct Employe {
+    int id;
+    std::string nom;
+    std::string prenom;
+    Service service;
+    Employe* prev;
+    Employe* next;
+};
+</pre></div>
+        <div class="info-box">Initialiser <code>prev</code>/<code>next</code> à <code>nullptr</code> lors de la création.</div>
+    </div>
+
+    <div class="slide">
+        <h2>Stockage principal</h2>
+        <ul>
+            <li>Liste <strong>doublement chaînée</strong> d’employés (pointeurs <code>head</code> et <code>tail</code>).</li>
+            <li>Insertion/suppression à différents endroits → prévoir fonctions dédiées.</li>
+            <li>Pour l’option 6, créer une <strong>liste simple</strong> (<code>struct NoeudSimple { Employe data; NoeudSimple* next; };</code>) qui recevra uniquement les employés du service MAINTENANCE.</li>
+        </ul>
+    </div>
+
+    <div class="slide">
+        <h2>Menu obligatoire (1/2)</h2>
+        <ol>
+            <li><strong>Créer des employés</strong> : tant que l’utilisateur répond O/o, créer un nouvel employé (id auto ou saisi) et l’ajouter (par défaut en fin).</li>
+            <li><strong>Afficher</strong> : parcourir la liste double et afficher id/nom/prénom/service.</li>
+            <li><strong>Ajout en début</strong> : insérer un employé tout au début.</li>
+            <li><strong>Ajout en fin</strong> : insérer après le dernier élément (équivalent option 1 mais isolé).</li>
+            <li><strong>Ajout à une position</strong> : demander un index (0 = début). Vérifier les bornes.</li>
+        </ol>
+    </div>
+
+    <div class="slide">
+        <h2>Menu obligatoire (2/2)</h2>
+        <ol start="6">
+            <li><strong>Transfert</strong> : déplacer (ou copier) tous les employés dont le service == MAINTENANCE vers une liste simple. Après transfert, ils doivent être retirés de la liste double.</li>
+            <li><strong>Supprimer en début</strong> : retirer le premier employé.</li>
+            <li><strong>Supprimer en fin</strong> : retirer le dernier employé.</li>
+            <li><strong>Supprimer à une position</strong> : retirer selon un index (vérifier la validité).</li>
+            <li><strong>Quitter</strong> : nettoyer toutes les listes (<code>delete</code> systématique) avant <code>return 0</code>.</li>
+        </ol>
+    </div>
+
+    <div class="slide">
+        <h2>Détails option 1 — Création</h2>
+        <ul>
+            <li>Demander id (unique), nom, prénom, service (lettre R/M/I ou menu numérique).</li>
+            <li>Temps de saisie : valider l’entrée (service incorrect → redemander).</li>
+            <li>Ajouter un drapeau pour arrêter (question « Ajouter un autre employé ? (O/N) »).</li>
+        </ul>
+    </div>
+
+    <div class="slide">
+        <h2>Détails option 5 — Ajout à une position</h2>
+        <ul>
+            <li>Position 0: appeler l’insertion en début.</li>
+            <li>Position >= taille : insertion en fin.</li>
+            <li>Sinon : parcourir jusqu’à l’index et insérer entre les nœuds (mettre à jour <code>prev/next</code>).</li>
+            <li>Afficher un message d’erreur si la liste est vide.</li>
+        </ul>
+    </div>
+
+    <div class="slide">
+        <h2>Détails option 6 — Transfert</h2>
+        <ul>
+            <li>Parcourir la liste double, détecter les employés MAINTENANCE.</li>
+            <li>Les retirer proprement (mettre à jour voisins, décrémenter la taille).</li>
+            <li>Les insérer dans une liste <strong>simple</strong> (ex: ajout en tête simple <code>next</code> uniquement).</li>
+            <li>Afficher ensuite le contenu de la liste simple pour confirmer.</li>
+        </ul>
+        <div class="info-box">Bonus: proposer l’export de cette liste dans un fichier texte.</div>
+    </div>
+
+    <div class="slide">
+        <h2>Tests &amp; validation</h2>
+        <ul>
+            <li>Créer au moins 5 employés couvrant les 3 services.</li>
+            <li>Tester toutes les options (insérer/supprimer sur listes vides et non vides).</li>
+            <li>Vérifier les pointeurs <code>prev/next</code> après chaque opération avec un mode debug (afficher l’id précédent et suivant).</li>
+            <li>Utiliser <code>valgrind</code> ou équivalent pour détecter les fuites mémoire.</li>
+        </ul>
+    </div>
+
+    <div class="slide">
+        <h2>Livrables &amp; critères</h2>
+        <ul>
+            <li>Code commenté seulement lorsque nécessaire (explications des sections complexes).</li>
+            <li>Respecter les conventions : fonctions séparées (créer, afficher, insérer, supprimer, transférer).</li>
+            <li>Bonus possibles : recherche par service, export CSV, compteur d’employés transférés.</li>
+            <li>Évaluation suggérée : 50% fonctionnalités, 25% robustesse (saisie, tests), 25% qualité code (structure, fuites).</li>
+        </ul>
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+        <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">11</span></span>
+        <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+    </div>
+</div>
+
+<script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

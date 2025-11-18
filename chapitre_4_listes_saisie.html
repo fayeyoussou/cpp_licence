@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 4 — Listes dynamiques et vecteurs</title>
+    <link rel="stylesheet" href="assets/css/cpp_intro.css">
+    <meta name="description" content="Listes chaînées simples/doubles, manipulation avec new/delete" />
+</head>
+<body>
+    <div class="presentation-container">
+        <a class="back-link" href="index.html">← Retour au menu</a>
+
+        <div class="slide active title-slide">
+            <h1>Chapitre 4 — Listes dynamiques</h1>
+            <p class="subtitle"></p>
+        </div>
+
+        <div class="slide">
+            <h2>Objectifs du chapitre</h2>
+            <ul>
+                <li>Comprendre pourquoi utiliser une structure dynamique (liste simple ou double)</li>
+                <li>Écrire et manipuler des listes chaînées simples et doubles</li>
+                <li>Équilibrer <code>new</code>/<code>delete</code> pour éviter les fuites</li>
+                <li>Maîtriser une implémentation complète de liste double (insertion, suppression, parcours)</li>
+                <li>Savoir choisir entre liste simple et double selon les opérations</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Pourquoi des listes dynamiques ?</h2>
+            <ul>
+                <li>Tableau statique = taille fixée à la compilation</li>
+                <li>Liste dynamique = on ajoute/supprime pendant l&#39;exécution</li>
+                <li>Chaque nœud contient une valeur + l&#39;adresse du suivant</li>
+                <li>Insertion/suppression au milieu sans décaler le reste</li>
+            </ul>
+            <div class="info-box">Modèle mental : <code>tete → [valeur|suivant] → [valeur|suivant] → nullptr</code></div>
+        </div>
+
+        <div class="slide">
+            <h2>Structure d&#39;un nœud</h2>
+            <div class="code-example"><pre>struct Noeud {
+    int valeur;
+    Noeud* suivant;
+};
+
+Noeud* tete = nullptr; // liste vide
+</pre></div>
+            <ul>
+                <li><code>Noeud</code> stocke la donnée + le lien vers le nœud suivant</li>
+                <li><code>tete</code> garde l&#39;adresse du premier élément (ou <code>nullptr</code>)</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Bibliothèque <code>ns</code> (liste simple)</h2>
+            <div class="code-example"><pre>#pragma once
+#include &lt;cstddef&gt;
+
+namespace ns {
+    struct Noeud {
+        int valeur;
+        Noeud* suivant;
+    };
+
+    void insererDebut(Noeud*&amp; tete, int valeur);
+    void insererFin(Noeud*&amp; tete, int valeur);
+    void afficherListe(const Noeud* tete);
+    void retirerDebut(Noeud*&amp; tete);
+    void vider(Noeud*&amp; tete);
+    bool insererApres(Noeud* tete, int cible, int valeur);
+    void supprimerBaleur(Noeud*&amp; tete, int valeur);
+}
+</pre></div>
+            <div class="info-box">Tous les exemples suivants incluent <code>#include "noeud_simple.hpp"</code> et utilisent <code>ns::</code> (ou un <code>using namespace ns;</code> local).</div>
+        </div>
+
+        <div class="slide">
+            <h2>Allouer et initialiser</h2>
+            <div class="code-example"><pre>using namespace ns;
+
+Noeud* n = new Noeud;
+n-&gt;valeur = 42;
+n-&gt;suivant = nullptr; // fin de liste
+
+// ... utilisation ...
+delete n; // libération
+</pre></div>
+            <ul>
+                <li><code>new</code> réserve la mémoire et retourne un pointeur</li>
+                <li>Toujours initialiser <code>suivant</code> (souvent à <code>nullptr</code>)</li>
+                <li>Chaque <code>new</code> doit être compensé par un <code>delete</code></li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Insertion en tête</h2>
+            <div class="code-example"><pre>using namespace ns;
+
+void insererDebut(Noeud*&amp; tete, int valeur) {
+    Noeud* nouveau = new Noeud{valeur, tete};
+    tete = nouveau;
+}
+</pre></div>
+            <ul>
+                <li>Créer le nœud, pointer vers l&#39;ancienne <code>tete</code>, puis déplacer <code>tete</code></li>
+                <li>Complexité constante → idéal comme pile</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Insertion en queue</h2>
+            <div class="code-example"><pre>using namespace ns;
+
+void insererFin(Noeud*&amp; tete, int valeur) {
+    Noeud* nouveau = new Noeud{valeur, nullptr};
+    if (!tete) { tete = nouveau; return; }
+    Noeud* courant = tete;
+    while (courant-&gt;suivant) courant = courant-&gt;suivant;
+    courant-&gt;suivant = nouveau;
+}
+</pre></div>
+            <ul>
+                <li>Parcourir jusqu&#39;au dernier nœud avant d&#39;attacher le nouvel élément</li>
+                <li>Plus coûteux qu&#39;une insertion en tête, mais conserve l&#39;ordre</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Parcourir et afficher</h2>
+            <div class="code-example"><pre>using namespace ns;
+
+void afficherListe(const Noeud* tete) {
+    for (const Noeud* courant = tete; courant; courant = courant-&gt;suivant)
+        std::cout &lt;&lt; courant-&gt;valeur &lt;&lt; " ";
+    std::cout &lt;&lt; "\n";
+}
+</pre></div>
+            <ul>
+                <li>Utiliser un pointeur temporaire pour ne pas perdre <code>tete</code></li>
+                <li>Tester <code>courant</code> avant d&#39;accéder à sa valeur</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Suppression en tête &amp; nettoyage</h2>
+            <div class="code-example"><pre>using namespace ns;
+
+void retirerDebut(Noeud*&amp; tete) {
+    if (!tete) return;
+    Noeud* a_supprimer = tete;
+    tete = tete-&gt;suivant;
+    delete a_supprimer;
+}
+
+void viderListe(Noeud*&amp; tete) {
+    while (tete) retirerDebut(tete);
+}
+</pre></div>
+            <ul>
+                <li><code>retirerDebut</code> enlève un élément et libère la mémoire</li>
+                <li><code>viderListe</code> permet de terminer proprement le programme</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Insertion ciblée</h2>
+            <div class="code-example"><pre>using namespace ns;
+
+bool insererApres(Noeud* tete, int cible, int valeur) {
+    for (Noeud* courant = tete; courant; courant = courant-&gt;suivant) {
+        if (courant-&gt;valeur == cible) {
+            Noeud* nouveau = new Noeud{valeur, courant-&gt;suivant};
+            courant-&gt;suivant = nouveau;
+            return true;
+        }
+    }
+    return false;
+}
+</pre></div>
+            <ul>
+                <li>Parcourir jusqu&#39;à la valeur cible, sinon retourner <code>false</code></li>
+                <li>Prévoir la gestion du cas « non trouvé » pour éviter une fuite</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Suppression ciblée</h2>
+            <div class="code-example"><pre>using namespace ns;
+
+void supprimerValeur(Noeud*&amp; tete, int valeur) {
+    while (tete &amp;&amp; tete-&gt;valeur == valeur) retirerDebut(tete);
+    Noeud* courant = tete;
+    while (courant &amp;&amp; courant-&gt;suivant) {
+        if (courant-&gt;suivant-&gt;valeur == valeur) {
+            Noeud* a_supprimer = courant-&gt;suivant;
+            courant-&gt;suivant = a_supprimer-&gt;suivant;
+            delete a_supprimer;
+        } else {
+            courant = courant-&gt;suivant;
+        }
+    }
+}
+</pre></div>
+            <ul>
+                <li>Gérer séparément le cas où les premiers éléments correspondent</li>
+                <li>Conserver un pointeur sur l&#39;élément précédent</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Listes doublement chaînées</h2>
+            <div class="code-example"><pre>struct NoeudDouble {
+    int valeur;
+    NoeudDouble* suivant;
+    NoeudDouble* precedent;
+};
+</pre></div>
+            <ul>
+                <li>Chaque nœud connaît son voisin précédent et suivant</li>
+                <li>Facilite les suppressions et le parcours inverse</li>
+                <li>Coût mémoire un peu plus élevé</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Bibliothèque <code>nd</code> (liste double)</h2>
+            <div class="code-example"><pre>#pragma once
+#include &lt;cstddef&gt;
+
+namespace nd {
+    struct NoeudDouble {
+        int valeur;
+        NoeudDouble* suivant;
+        NoeudDouble* precedent;
+    };
+
+    void insererDebut(NoeudDouble*&amp; tete, NoeudDouble*&amp; queue, int valeur);
+    void insererFin(NoeudDouble*&amp; tete, NoeudDouble*&amp; queue, int valeur);
+    bool insererApres(NoeudDouble*&amp; queue, NoeudDouble* position, int valeur);
+    bool insererAvant(NoeudDouble*&amp; tete, NoeudDouble* position, int valeur);
+    NoeudDouble* insererApres(NoeudDouble* position, int valeur);
+    NoeudDouble* insererAvant(NoeudDouble* position, int valeur);
+    void afficherInverse(const NoeudDouble* queue);
+    void retirerDebut(NoeudDouble*&amp; tete, NoeudDouble*&amp; queue);
+    void vider(NoeudDouble*&amp; tete, NoeudDouble*&amp; queue);
+}
+</pre></div>
+            <div class="info-box">Inclure <code>#include "noeud_double.hpp"</code> et référencer les fonctions via <code>nd::</code>.</div>
+        </div>
+
+        <div class="slide">
+            <h2>Insertion dans une liste double</h2>
+            <div class="code-example"><pre>using namespace nd;
+
+void insererApres(NoeudDouble* position, int valeur) {
+    if (!position) return;
+    NoeudDouble* nouveau = new NoeudDouble{valeur, position-&gt;suivant, position};
+    if (position-&gt;suivant) position-&gt;suivant-&gt;precedent = nouveau;
+    position-&gt;suivant = nouveau;
+}
+</pre></div>
+            <ul>
+                <li>Mettre à jour les 4 pointeurs (<code>suivant</code>/<code>precedent</code>)</li>
+                <li>Symétrique avec une fonction <code>insererAvant</code></li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Parcours inverse</h2>
+            <div class="code-example"><pre>using namespace nd;
+
+void afficherInverse(const NoeudDouble* queue) {
+    for (const NoeudDouble* courant = queue; courant; courant = courant-&gt;precedent)
+        std::cout &lt;&lt; courant-&gt;valeur &lt;&lt; " ";
+    std::cout &lt;&lt; "\n";
+}
+</pre></div>
+            <ul>
+                <li>Conserver un pointeur <code>queue</code> sur le dernier nœud</li>
+                <li>Permet de lire la liste à rebours sans recopier</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Choisir entre liste simple et double</h2>
+            <ul>
+                <li><strong>Liste simple</strong> : mémoire minimale, idéale quand on manipule surtout la tête (piles, files).</li>
+                <li><strong>Liste double</strong> : insertion/suppression efficaces même au milieu, possibilité de parcourir à rebours.</li>
+                <li><strong>Queue</strong> en plus de la tête = meilleure performance pour les insertions en fin.</li>
+                <li>Si l&#39;on doit souvent remonter ou insérer avant un nœud connu → préférer la version double.</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Bibliothèque NoeudDouble (1/2)</h2>
+            <div class="code-example"><pre>#include "noeud_double.hpp"
+#include &lt;iostream&gt;
+
+namespace nd {
+
+void insererDebut(NoeudDouble*&amp; tete, NoeudDouble*&amp; queue, int valeur) {
+    NoeudDouble* nouveau = new NoeudDouble{valeur, tete, nullptr};
+    if (tete) {
+        tete-&gt;precedent = nouveau;
+    } else {
+        queue = nouveau;
+    }
+    tete = nouveau;
+}
+
+void insererFin(NoeudDouble*&amp; tete, NoeudDouble*&amp; queue, int valeur) {
+    NoeudDouble* nouveau = new NoeudDouble{valeur, nullptr, queue};
+    if (!queue) { tete = queue = nouveau; return; }
+    queue-&gt;suivant = nouveau;
+    queue = nouveau;
+}
+
+bool insererApres(NoeudDouble*&amp; queue, NoeudDouble* position, int valeur) {
+    if (!position) return false;
+    NoeudDouble* nouveau = new NoeudDouble{valeur, position-&gt;suivant, position};
+    if (position-&gt;suivant) {
+        position-&gt;suivant-&gt;precedent = nouveau;
+    } else {
+        queue = nouveau;
+    }
+    position-&gt;suivant = nouveau;
+    return true;
+}
+
+</pre></div>
+            <ul>
+                <li><strong>insererDebut</strong> gère simultanément <code>tete</code> et <code>queue</code> : si la liste était vide, les deux pointent sur le nouveau nœud.</li>
+                <li><strong>insererFin</strong> s&#39;appuie sur la queue pour éviter un parcours complet, puis relie l&#39;ancien dernier nœud au nouveau.</li>
+                <li><strong>insererApres</strong> met à jour les pointeurs des voisins (et la queue si besoin) puis renvoie <code>true</code> seulement si la position était valide.</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Bibliothèque NoeudDouble (2/2)</h2>
+            <div class="code-example"><pre>bool insererAvant(NoeudDouble*&amp; tete, NoeudDouble* position, int valeur) {
+    if (!position) return false;
+    NoeudDouble* nouveau = new NoeudDouble{valeur, position, position-&gt;precedent};
+    if (position-&gt;precedent) position-&gt;precedent-&gt;suivant = nouveau;
+    else tete = nouveau;
+    position-&gt;precedent = nouveau;
+    return true;
+}
+
+void afficherInverse(const NoeudDouble* queue) {
+    for (const NoeudDouble* courant = queue; courant; courant = courant-&gt;precedent)
+        std::cout &lt;&lt; courant-&gt;valeur &lt;&lt; " ";
+    std::cout &lt;&lt; "
+";
+}
+
+void retirerDebut(NoeudDouble*&amp; tete, NoeudDouble*&amp; queue) {
+    if (!tete) return;
+    NoeudDouble* a_supprimer = tete;
+    tete = tete-&gt;suivant;
+    if (tete) tete-&gt;precedent = nullptr; else queue = nullptr;
+    delete a_supprimer;
+}
+
+void vider(NoeudDouble*&amp; tete, NoeudDouble*&amp; queue) {
+    while (tete) retirerDebut(tete, queue);
+}
+
+} // namespace nd
+</pre></div>
+            <ul>
+                <li><strong>insererAvant</strong> est le symétrique d&#39;<code>insererApres</code> : si l&#39;on insère avant la tête, celle-ci est mise à jour.</li>
+                <li><strong>afficherInverse</strong> illustre l&#39;intérêt d&#39;une liste double pour remonter rapidement depuis la queue.</li>
+                <li><strong>retirerDebut</strong> et <strong>vider</strong> maintiennent des pointeurs cohérents tout en libérant la mémoire.</li>
+                <li>Rassembler ces fonctions dans le namespace <code>nd</code> clarifie l&#39;API et évite les collisions de noms.</li>
+            </ul>
+        </div>
+
+
+        <div class="slide">
+            <h2>Transférer vers une liste simple</h2>
+            <div class="code-example"><pre>using namespace nd;
+
+// pseudo-code pour l'option « transfert »
+NoeudDouble* courant = tete;
+while (courant) {
+    NoeudDouble* suivant = courant-&gt;suivant;
+    if (courant-&gt;valeur == MAINTENANCE) {
+        if (courant-&gt;precedent) courant-&gt;precedent-&gt;suivant = suivant; else tete = suivant;
+        if (suivant) suivant-&gt;precedent = courant-&gt;precedent; else queue = courant-&gt;precedent;
+        insererSimple(courant-&gt;valeur);
+        delete courant;
+    }
+    courant = suivant;
+}
+</pre></div>
+            <div class="info-box">Mémoriser <code>suivant</code> avant les modifications évite de « perdre » le reste de la liste.</div>
+        </div>
+
+        <div class="slide">
+            <h2>Invariants à surveiller</h2>
+            <ul>
+                <li><code>tete</code> et <code>queue</code> valent tous deux <code>nullptr</code> quand la liste est vide.</li>
+                <li>Pour tout nœud : <code>n-&gt;suivant-&gt;precedent == n</code> et <code>n-&gt;precedent-&gt;suivant == n</code>.</li>
+                <li>Chaque insertion/suppression ajuste exactement un lien vers l'avant et un lien vers l'arrière.</li>
+                <li>Toute allocation (<code>new</code>) est équilibrée par un <code>delete</code>.</li>
+                <li>Écrire une fonction de vérification qui parcourt la liste et affiche les valeurs des pointeurs pour faciliter le débogage.</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Plan de menu suggéré</h2>
+            <ol>
+                <li>Initialiser <code>tete</code>, <code>queue</code> et la liste simple de transfert à <code>nullptr</code>.</li>
+                <li>Afficher le menu dans une boucle, lire le choix, puis appeler une fonction dédiée (<code>creerEmployes</code>, <code>afficher</code>, <code>insererDebut</code>, etc.).</li>
+                <li>Centraliser la saisie d&#39;un employé (id, nom, prénom, service) pour réutiliser le code.</li>
+                <li>Lors du transfert, indiquer combien d&#39;employés ont quitté la liste double et afficher la liste simple.</li>
+                <li>Avant de quitter, appeler <code>vider</code> sur la liste double et sur la liste simple.</li>
+            </ol>
+        </div>
+
+        <!-- Exemples pratiques (slides 21 à 40) -->
+
+        <div class="slide">
+            <h2>Exemple 1 — Construire et afficher</h2>
+            <div class="code-example"><pre>int main() {
+    Noeud* tete = nullptr;
+    int valeurs[] = {3, 8, 1};
+    for (int v : valeurs) insererDebut(tete, v);
+    afficherListe(tete);
+    viderListe(tete);
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 1 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// On insère en tête, donc la liste s'inverse
+int main() {
+    Noeud* tete = nullptr;
+    int valeurs[] = {3, 8, 1};
+    for (int v : valeurs) insererDebut(tete, v);
+    afficherListe(tete); // 1 8 3
+    viderListe(tete);
+}
+</pre></div>
+            <p>Résultat affiché : <strong>1 8 3</strong> — l&#39;ordre est inversé car on insère toujours devant.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 2 — Insertion ciblée</h2>
+            <div class="code-example"><pre>int main() {
+    Noeud* tete = nullptr;
+    insererFin(tete, 10);
+    insererFin(tete, 20);
+    insererFin(tete, 30);
+    insererApres(tete, 20, 99);
+    afficherListe(tete);
+    viderListe(tete);
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 2 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// La nouvelle valeur 99 est insérée après le premier 20
+// Liste finale : 10 20 99 30
+int main() {
+    Noeud* tete = nullptr;
+    insererFin(tete, 10);
+    insererFin(tete, 20);
+    insererFin(tete, 30);
+    insererApres(tete, 20, 99);
+    afficherListe(tete);
+    viderListe(tete);
+}
+</pre></div>
+            <p>Résultat affiché : <strong>10 20 99 30</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 3 — Suppression d&#39;occurrences</h2>
+            <div class="code-example"><pre>int main() {
+    Noeud* tete = nullptr;
+    int valeurs[] = {5, 5, 7, 5, 9};
+    for (int v : valeurs) insererFin(tete, v);
+    supprimerValeur(tete, 5);
+    afficherListe(tete);
+    viderListe(tete);
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 3 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// supprimerValeur supprime toutes les valeurs égales à 5
+// Il reste 7 puis 9
+int main() {
+    Noeud* tete = nullptr;
+    int valeurs[] = {5, 5, 7, 5, 9};
+    for (int v : valeurs) insererFin(tete, v);
+    supprimerValeur(tete, 5);
+    afficherListe(tete); // 7 9
+    viderListe(tete);
+}
+</pre></div>
+            <p>Résultat affiché : <strong>7 9</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 4 — Liste double &amp; parcours inverse</h2>
+            <div class="code-example"><pre>NoeudDouble* tete = nullptr;
+NoeudDouble* queue = nullptr;
+auto insererFinDouble = [&](int valeur) {
+    NoeudDouble* nouveau = new NoeudDouble{valeur, nullptr, queue};
+    if (!tete) tete = nouveau;
+    if (queue) queue-&gt;suivant = nouveau;
+    queue = nouveau;
+};
+
+int main() {
+    insererFinDouble(1); insererFinDouble(2); insererFinDouble(3);
+    afficherInverse(queue);
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 4 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Chaque nœud connaît son précédent → on part de la queue
+insererFinDouble(1); insererFinDouble(2); insererFinDouble(3);
+afficherInverse(queue); // affiche 3 2 1
+</pre></div>
+            <p>Résultat affiché : <strong>3 2 1</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 5 — Somme et moyenne</h2>
+            <div class="code-example"><pre>double moyenne(const Noeud* tete) {
+    int n = 0; long somme = 0;
+    for (const Noeud* courant = tete; courant; courant = courant-&gt;suivant) {
+        somme += courant-&gt;valeur;
+        ++n;
+    }
+    return n ? double(somme) / n : 0.0;
+}
+
+int main() {
+    Noeud* tete = nullptr;
+    insererFin(tete, 4);
+    insererFin(tete, 6);
+    std::cout &lt;&lt; moyenne(tete);
+    viderListe(tete);
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 5 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// 4 + 6 = 10, n = 2 → moyenne = 5.0
+std::cout &lt;&lt; moyenne(tete); // affiche 5
+</pre></div>
+            <p>Résultat affiché : <strong>5</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 6 — Construire une liste double</h2>
+            <div class="code-example"><pre>int main() {
+    NoeudDouble* tete = nullptr;
+    NoeudDouble* queue = nullptr;
+    nd::insererDebut(tete, queue, 3);
+    nd::insererFin(tete, queue, 7);
+    nd::insererFin(tete, queue, 9);
+    for (NoeudDouble* c = tete; c; c = c-&gt;suivant)
+        std::cout &lt;&lt; c-&gt;valeur &lt;&lt; " ";
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 6 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// 1) insererDebut → liste = [3]
+// 2) insererFin(7) → [3,7]
+// 3) insererFin(9) → [3,7,9]
+// Parcours depuis la tête pour affichage
+std::cout &lt;&lt; "3 7 9";
+</pre></div>
+            <p>Résultat affiché : <strong>3 7 9</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 7 — Insérer avant/après</h2>
+            <div class="code-example"><pre>int main() {
+    NoeudDouble* tete = nullptr;
+    NoeudDouble* queue = nullptr;
+    nd::insererFin(tete, queue, 10);
+    nd::insererFin(tete, queue, 20);
+    NoeudDouble* pos = tete-&gt;suivant; // valeur 20
+    nd::insererAvant(tete, pos, 15);   // 15 avant 20
+    nd::insererApres(queue, pos, 25);  // 25 après 20
+    for (NoeudDouble* c = tete; c; c = c-&gt;suivant)
+        std::cout &lt;&lt; c-&gt;valeur &lt;&lt; " ";
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 7 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Liste initiale : 10 ↔ 20
+// insererAvant(20,15) : 10 ↔ 15 ↔ 20
+// insererApres(20,25) : 10 ↔ 15 ↔ 20 ↔ 25
+// Parcours complet → 10 15 20 25
+</pre></div>
+            <p>Résultat affiché : <strong>10 15 20 25</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 8 — Retirer &amp; vider</h2>
+            <div class="code-example"><pre>int main() {
+    NoeudDouble* tete = nullptr;
+    NoeudDouble* queue = nullptr;
+    for (int v : {5, 6, 7}) nd::insererFin(tete, queue, v);
+    nd::retirerDebut(tete, queue); // retire 5
+    for (NoeudDouble* c = tete; c; c = c-&gt;suivant)
+        std::cout &lt;&lt; c-&gt;valeur &lt;&lt; " ";
+    nd::vider(tete, queue);
+    std::cout &lt;&lt; " | "
+              &lt;&lt; (tete ? "reste" : "liste vide");
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 8 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Liste initiale : 5 6 7
+// retirerDebut enlève 5 → affichage "6 7"
+// nd::vider remet tete/queue à nullptr
+</pre></div>
+            <p>Résultat affiché : <strong>6 7 | liste vide</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 9 — Parcours inverse</h2>
+            <div class="code-example"><pre>int main() {
+    NoeudDouble* tete = nullptr;
+    NoeudDouble* queue = nullptr;
+    for (int v : {1, 2, 3, 4}) nd::insererFin(tete, queue, v);
+    std::cout &lt;&lt; "Vers l'avant: ";
+    for (NoeudDouble* c = tete; c; c = c-&gt;suivant)
+        std::cout &lt;&lt; c-&gt;valeur &lt;&lt; ' ';
+    std::cout &lt;&lt; "\nVers l'arrière: ";
+    nd::afficherInverse(queue);
+    nd::vider(tete, queue);
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 9 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Parcours avant: 1 2 3 4
+// afficherInverse utilise les pointeurs "precedent"
+// Parcours arrière: 4 3 2 1
+</pre></div>
+            <p>Résultat affiché : <strong>Vers l'avant: 1 2 3 4 / Vers l'arrière: 4 3 2 1</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 10 — Convertir une liste en vecteur</h2>
+            <div class="code-example"><pre>int main() {
+    Noeud* tete = nullptr;
+    for (int v : {4, 1, 7}) insererFin(tete, v);
+
+    std::vector&lt;int&gt; v;
+    for (Noeud* courant = tete; courant; courant = courant-&gt;suivant)
+        v.push_back(courant-&gt;valeur);
+
+    for (int x : v) std::cout &lt;&lt; x &lt;&lt; " ";
+    viderListe(tete);
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 10 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// On parcourt la liste et on copie chaque valeur dans le vecteur
+// Le vecteur peut ensuite être utilisé avec les algorithmes STL
+// Affichage: 4 1 7
+</pre></div>
+            <p>Résultat affiché : <strong>4 1 7</strong>.</p>
+        </div>
+
+        <div class="controls">
+            <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+            <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">40</span></span>
+            <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+        </div>
+    </div>
+
+    <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

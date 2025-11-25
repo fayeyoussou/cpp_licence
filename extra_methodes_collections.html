@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annexe — Méthodes clés (string, vector, conversions)</title>
+  <link rel="stylesheet" href="assets/css/cpp_intro.css">
+  <meta name="description" content="Rappel des méthodes essentielles pour std::string, std::vector et conversions courantes (cctype, stoi, to_string).">
+</head>
+<body>
+  <div class="presentation-container">
+    <a class="back-link" href="index.html">← Retour au menu</a>
+
+    <!-- Slide 1 -->
+    <div class="slide active title-slide">
+      <h1>Méthodes utiles</h1>
+      <p class="subtitle">std::string, std::vector, algos de base, conversions</p>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="slide">
+      <h2>Objectifs</h2>
+      <ul>
+        <li>Retenir les méthodes clés sur <code>std::string</code> et <code>std::vector</code></li>
+        <li>Manipuler tableaux/chaînes simplement (parcours, recherche, modif)</li>
+        <li>Connaître les fonctions <code>&lt;cctype&gt;</code> utiles (isalnum, tolower…)</li>
+        <li>Convertir nombres ⇔ chaînes et caster proprement</li>
+      </ul>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide">
+      <h2>std::string : bases</h2>
+      <div class="code-example"><pre>std::string s = "Hello";
+s.size();      // longueur
+s.empty();     // vrai si longueur = 0
+s[1];          // 'e' (pas de vérif)
+s.at(1);       // 'e' (avec vérif)</pre></div>
+      <div class="info-box"><code>size</code> donne le nombre de caractères, <code>empty</code> vérifie si 0. <code>[]</code> lit vite sans vérifier (à éviter si indice douteux); <code>at</code> vérifie et lève une exception si l’indice dépasse.</div>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="slide">
+      <h2>Ajouter / retirer</h2>
+      <div class="code-example"><pre>std::string s = "Hello";
+s.push_back('!'); // Hello!
+s.pop_back();     // retire le dernier
+s += " world";    // concat
+s.append("!!!");  // ajoute</pre></div>
+      <div class="info-box"><code>push_back</code>/<code>pop_back</code> gèrent un caractère en fin de chaîne. <code>+=</code> et <code>append</code> concatènent du texte à la fin; privilégier <code>+=</code> pour du court, <code>append</code> pour du plus long.</div>
+    </div>
+
+    <!-- Slide 5 -->
+    <div class="slide">
+      <h2>Extraire</h2>
+      <div class="code-example"><pre>std::string s = "programmer";
+auto sub = s.substr(0, 7); // "program"
+auto fin = s.substr(7);    // "mer"</pre></div>
+      <div class="info-box"><code>substr(pos, len)</code> copie une portion; sans <code>len</code> prend jusqu’à la fin. Utile pour découper des champs simples.</div>
+    </div>
+
+    <!-- Slide 6 -->
+    <div class="slide">
+      <h2>Rechercher</h2>
+      <div class="code-example"><pre>std::string s = "abcabc";
+auto pos = s.find("bc"); // 1
+if (pos != std::string::npos) { /* trouvé */ }
+s.rfind("bc"); // depuis la fin
+s.find_first_of("xyz"); // cherche un des chars</pre></div>
+      <div class="info-box"><code>find</code>/<code>rfind</code> cherchent un motif; renvoient <code>npos</code> si absent. <code>find_first_of</code> trouve la première occurrence d’un caractère parmi une liste. Toujours vérifier <code>!= npos</code> avant d’utiliser l’indice.</div>
+    </div>
+
+    <!-- Slide 7 -->
+    <div class="slide">
+      <h2>Remplacer / supprimer</h2>
+      <div class="code-example"><pre>std::string s = "salut";
+s.replace(0, 1, "S"); // Salut
+s.erase(2, 1);        // Sa lut -> "Salt"
+s.insert(2, "++");    // Sa++lt</pre></div>
+      <div class="info-box"><code>replace</code> change une portion par un autre texte. <code>erase</code> supprime <code>count</code> caractères dès <code>pos</code>. <code>insert</code> ajoute du texte avant <code>pos</code>. Attention aux indices si la chaîne change de taille.</div>
+    </div>
+
+    <!-- Slide 8 -->
+    <div class="slide">
+      <h2>Comparer</h2>
+      <div class="code-example"><pre>std::string a="abc", b="abd";
+bool eq = (a == b);       // comparaison lexicale
+int cmp = a.compare(b);   // &lt;0 si a&lt;b, 0 si égal, &gt;0 si a&gt;b</pre></div>
+      <div class="info-box"><code>==</code> teste l’égalité. <code>compare</code> donne l’ordre lexicographique (utile pour trier ou ordonner).</div>
+    </div>
+
+    <!-- Slide 9 -->
+    <div class="slide">
+      <h2>Parcourir</h2>
+      <div class="code-example"><pre>std::string s = "Hi!";
+for(char c : s) std::cout &lt;&lt; c &lt;&lt; ' ';
+for(size_t i=0;i&lt;s.size();++i) std::cout &lt;&lt; s[i];</pre></div>
+      <div class="info-box">Boucle range-based pour la lisibilité; boucle par indice si vous avez besoin de la position ou de modifier certaines cases.</div>
+    </div>
+
+    <!-- Slide 10 -->
+    <div class="slide">
+      <h2>Conversions string ⇔ nombre</h2>
+      <div class="code-example"><pre>int    n  = std::stoi("42");
+double d = std::stod("3.14");
+auto  s1 = std::to_string(123);   // "123"
+auto  s2 = std::to_string(3.5);   // "3.500000"</pre></div>
+      <div class="info-box"><code>stoi/stod</code> lisent une chaîne en nombre (lèvent si invalide) : entourer d’un <code>try</code>/<code>catch</code>. <code>to_string</code> formate un nombre en texte (attention aux décimales par défaut).</div>
+    </div>
+
+    <!-- Slide 11 -->
+    <div class="slide">
+      <h2>cctype : tester un caractère</h2>
+      <div class="code-example"><pre>#include &lt;cctype&gt;
+char c = 'A';
+std::isalpha(c); // lettre ?
+std::isdigit(c); // chiffre ?
+std::isalnum(c); // lettre ou chiffre ?
+std::isspace(c); // espace, tab, \n ?</pre></div>
+      <div class="info-box">Fonctions utiles pour filtrer/valider les caractères d’une entrée; pratique pour nettoyer un input utilisateur.</div>
+    </div>
+
+    <!-- Slide 12 -->
+    <div class="slide">
+      <h2>cctype : transformer</h2>
+      <div class="code-example"><pre>#include &lt;cctype&gt;
+std::string s = "HeLLo";
+for(char&amp; c : s){
+  c = std::tolower(static_cast<unsigned char>(c));
+} // "hello"</pre></div>
+      <div class="info-box"><code>tolower</code>/<code>toupper</code> transforment un caractère. Cast en <code>unsigned char</code> pour rester défini avec les caractères accentués. Faire le parcours en place ou construire une nouvelle chaîne.</div>
+    </div>
+
+    <!-- Slide 13 -->
+    <div class="slide">
+      <h2>std::vector : bases</h2>
+      <div class="code-example"><pre>#include &lt;vector&gt;
+std::vector&lt;int&gt; v;          // vide
+std::vector&lt;int&gt; v2(5, 0);    // 5 zéros
+v.size(); v.empty();</pre></div>
+      <div class="info-box"><code>size</code> = nombre d’éléments; <code>empty</code> teste 0 élément. Utiliser <code>size_t</code> pour parcourir.</div>
+    </div>
+
+    <!-- Slide 14 -->
+    <div class="slide">
+      <h2>Ajouter / retirer</h2>
+      <div class="code-example"><pre>std::vector&lt;int&gt; v;
+v.push_back(3);
+v.emplace_back(4); // construit sur place
+v.pop_back();      // retire le dernier</pre></div>
+      <div class="info-box"><code>push_back</code>/<code>emplace_back</code> ajoutent en fin (emplace construit sur place). <code>pop_back</code> enlève le dernier (si non vide). </div>
+    </div>
+
+    <!-- Slide 15 -->
+    <div class="slide">
+      <h2>Accès</h2>
+      <div class="code-example"><pre>v[0];        // sans vérif
+v.at(0);     // avec vérif
+v.front();   // premier
+v.back();    // dernier
+v.data();    // pointeur brut (int*)</pre></div>
+      <div class="info-box"><code>front/back</code> donnent les extrémités (vecteur non vide). <code>data</code> rend un pointeur C vers le stockage contigu (pour passer à une API C).</div>
+    </div>
+
+    <!-- Slide 16 -->
+    <div class="slide">
+      <h2>Modifier la taille</h2>
+      <div class="code-example"><pre>v.resize(10, 0);   // redimensionne, remplit avec 0 si besoin
+v.clear();         // vide
+v.assign(3, 5);    // devient {5,5,5}</pre></div>
+      <div class="info-box"><code>resize</code> agrandit ou réduit; <code>clear</code> vide; <code>assign</code> remplace tout par des copies d’une valeur. Utile pour réinitialiser rapidement.</div>
+    </div>
+
+    <!-- Slide 17 -->
+    <div class="slide">
+      <h2>Insérer / effacer</h2>
+      <div class="code-example"><pre>std::vector&lt;int&gt; v = {1,2,4};
+v.insert(v.begin()+2, 3); // {1,2,3,4}
+v.erase(v.begin());       // supprime le 1
+v.erase(v.begin(), v.end()); // vide</pre></div>
+      <div class="info-box"><code>insert</code> ajoute avant la position donnée (coût O(n)). <code>erase</code> retire un élément ou une plage. Après <code>insert/erase</code>, les pointeurs/itérateurs peuvent devenir invalides.</div>
+    </div>
+
+    <!-- Slide 18 -->
+    <div class="slide">
+      <h2>Capacité</h2>
+      <div class="code-example"><pre>v.reserve(100); // évite reallocs
+v.capacity();   // taille du buffer
+v.shrink_to_fit(); // demande de réduire</pre></div>
+      <div class="info-box"><code>reserve</code> pré-alloue pour éviter des reallocations (surtout si on connaît la taille). <code>capacity</code> lit la place réservée. <code>shrink_to_fit</code> demande de libérer le surplus (pas garanti).</div>
+    </div>
+
+    <!-- Slide 19 -->
+    <div class="slide">
+      <h2>Parcourir</h2>
+      <div class="code-example"><pre>std::vector&lt;int&gt; v = {1,2,3};
+for(int x : v) std::cout &lt;&lt; x;
+for(size_t i=0;i&lt;v.size();++i) std::cout &lt;&lt; v[i];</pre></div>
+      <div class="info-box">Range-based pour la simplicité; boucle par indice si besoin de l’index ou d’écrire dans le vecteur.</div>
+    </div>
+
+    <!-- Slide 20 -->
+    <div class="slide">
+      <h2>Algorithmes utiles</h2>
+      <div class="code-example"><pre>#include &lt;algorithm&gt;
+std::sort(v.begin(), v.end());
+std::reverse(v.begin(), v.end());
+auto it = std::find(v.begin(), v.end(), 3);
+int c = std::count(v.begin(), v.end(), 3);</pre></div>
+      <div class="info-box"><code>sort</code>/<code>reverse</code> réorganisent la séquence. <code>find</code> renvoie un itérateur (tester <code>it != end</code>). <code>count</code> compte les occurrences. Invalide rarement les itérateurs sauf opérations modifiant la taille.</div>
+    </div>
+
+    <!-- Slide 21 -->
+    <div class="slide">
+      <h2>Somme rapide</h2>
+      <div class="code-example"><pre>#include &lt;numeric&gt;
+int total = std::accumulate(v.begin(), v.end(), 0);</pre></div>
+    </div>
+
+    <!-- Slide 22 -->
+    <div class="slide">
+      <h2>Conversions & casts</h2>
+      <div class="code-example"><pre>double d = 3.9;
+int n = static_cast<int>(d); // 3
+char c = 'A';
+int ascii = static_cast<int>(c); // 65
+int x = 5;
+double y = x; // conversion implicite OK</pre></div>
+      <div class="info-box">Préférer <code>static_cast</code> aux casts en C (<code>(int)</code>).</div>
+    </div>
+
+    <!-- Slide 23 -->
+    <div class="slide">
+      <h2>Conversions string/nombre (rappel)</h2>
+      <div class="code-example"><pre>int n = std::stoi("12");
+double d = std::stod("2.5");
+std::string s = std::to_string(4.2);</pre></div>
+      <div class="info-box">Attraper les exceptions si la chaîne n'est pas valide.</div>
+    </div>
+
+    <!-- Slide 24 -->
+    <div class="slide">
+      <h2>Cheat sheet string</h2>
+      <ul>
+        <li>Info: <code>size</code>, <code>empty</code></li>
+        <li>Lecture: <code>operator[]</code>, <code>at</code>, <code>front</code>, <code>back</code></li>
+        <li>Modif: <code>push_back</code>, <code>pop_back</code>, <code>append</code>, <code>erase</code>, <code>insert</code>, <code>replace</code></li>
+        <li>Recherche: <code>find</code>, <code>rfind</code>, <code>substr</code></li>
+      </ul>
+    </div>
+
+    <!-- Slide 25 -->
+    <div class="slide">
+      <h2>Cheat sheet vector</h2>
+      <ul>
+        <li>Info: <code>size</code>, <code>empty</code>, <code>capacity</code></li>
+        <li>Accès: <code>[]</code>, <code>at</code>, <code>front</code>, <code>back</code>, <code>data</code></li>
+        <li>Modif: <code>push_back</code>, <code>emplace_back</code>, <code>insert</code>, <code>erase</code>, <code>resize</code>, <code>clear</code></li>
+        <li>Préallocation: <code>reserve</code>, <code>shrink_to_fit</code></li>
+      </ul>
+    </div>
+
+    <!-- Slide 26 -->
+    <div class="slide">
+      <h2>Cheat sheet conversions</h2>
+      <ul>
+        <li>Chars: <code>isalpha</code>, <code>isdigit</code>, <code>isalnum</code>, <code>isspace</code>, <code>tolower</code>, <code>toupper</code></li>
+        <li>Nombres ⇔ string: <code>stoi/stol/stof/stod</code>, <code>to_string</code></li>
+        <li>Casts: <code>static_cast&lt;type&gt;(expr)</code> pour préciser</li>
+      </ul>
+    </div>
+
+    <!-- Slide 27 -->
+    <div class="slide">
+      <h2>Défi : majuscules et tirés</h2>
+      <div class="code-example"><pre>// Entrée: "Hello World 42"
+// Sortie: "HELLO-WORLD-42"
+std::string transform(std::string s){
+  // TODO
+}</pre></div>
+    </div>
+
+    <!-- Slide 28 -->
+    <div class="slide">
+      <h2>Solution proposée</h2>
+      <div class="code-example"><pre>std::string transform(std::string s){
+  for(char&amp; c : s){
+    if (c == ' ') c = '-';
+    else c = std::toupper(static_cast<unsigned char>(c));
+  }
+  return s;
+}</pre></div>
+    </div>
+
+    <div class="controls">
+      <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+      <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">28</span></span>
+      <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+    </div>
+  </div>
+
+  <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

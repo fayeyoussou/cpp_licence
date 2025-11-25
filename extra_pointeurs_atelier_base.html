@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atelier Pointeurs 1 — Bases visuelles</title>
+  <link rel="stylesheet" href="assets/css/cpp_intro.css">
+  <meta name="description" content="Atelier pointeurs C/C++ niveau 2e annee : bases visuelles, adresses, tableaux, bornes et 2D.">
+</head>
+<body>
+  <div class="presentation-container">
+    <a class="back-link" href="index.html">← Retour au menu</a>
+
+    <!-- Slide 1 -->
+    <div class="slide active title-slide">
+      <h1>Pointeurs — Atelier 1</h1>
+      <p class="subtitle">Bases visuelles : adresses, tableaux, bornes</p>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="slide">
+      <h2>Objectifs</h2>
+      <ul>
+        <li>Comprendre adresses, pointeurs et references simples</li>
+        <li>Voir la memoire (pile / tas) avec de petits schémas</li>
+        <li>Parcourir des tableaux en securite (bornes)</li>
+        <li>Lire/ecrire via pointeurs et references</li>
+        <li>Premiers cas 2D et chaines en C</li>
+      </ul>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide">
+      <h2>Prerequis</h2>
+      <ul>
+        <li>Variables simples (<code>int</code>, <code>double</code>, <code>std::string</code>)</li>
+        <li>Fonctions basiques et tableaux 1D</li>
+        <li>Boucles <code>for</code>/<code>while</code>, conditions</li>
+      </ul>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="slide">
+      <h2>Metaphore</h2>
+      <ul>
+        <li>Variable = boite qui contient une valeur</li>
+        <li>Adresse = etiquette colle sur la boite</li>
+        <li>Pointeur = papier avec l’adresse notee</li>
+      </ul>
+      <div class="info-box">Dessiner boites et fleches aide a suivre.</div>
+    </div>
+
+    <!-- Slide 5 -->
+    <div class="slide">
+      <h2>Pile vs tas</h2>
+      <ul>
+        <li>Pile : variables locales, detruites en fin de bloc</li>
+        <li>Tas : <code>new</code>/<code>delete</code>, duree jusqu’a libération</li>
+        <li>Le pointeur note l’adresse, pas la duree de vie</li>
+      </ul>
+      <div class="code-example"><pre>// Schema simplifie (bas = plus hautes adresses)
+// PILE (automatique)
+// | main x=10 | f() local | ...
+// |-----------|-----------|
+// TAS (new/delete)
+// |  bloc A   |  bloc B   | ...
+// +------------------------+
+</pre></div>
+    </div>
+
+    <!-- Slide 6 -->
+    <div class="slide">
+      <h2>Exemple pile (auto)</h2>
+      <div class="code-example"><pre>void f(){
+  int local = 3;    // vit pendant f
+  std::cout &lt;&lt; &amp;local;
+}                    // local detruit ici
+int main(){ f(); }</pre></div>
+      <div class="code-example"><pre>// Stack frame de f
+// | local=3 |   &lt;-- &amp;local
+// (sortie) frame retiree : local n'existe plus
+</pre></div>
+    </div>
+
+    <!-- Slide 7 -->
+    <div class="slide">
+      <h2>Exemple tas (dyn)</h2>
+      <div class="code-example"><pre>int main(){
+  int* p = new int(42); // sur le tas
+  std::cout &lt;&lt; *p &lt;&lt; " @" &lt;&lt; p;
+  delete p;             // libération manuelle
+  p = nullptr;
+}</pre></div>
+      <div class="code-example"><pre>// Pile (main)        Tas
+// | p = 0x600... |   | [42] |
+//       |------------^
+// (delete) bloc tas libere, p remis a nullptr
+</pre></div>
+    </div>
+
+    <!-- Slide 8 -->
+    <div class="slide">
+      <h2>Lire une adresse</h2>
+      <div class="code-example"><pre>int x = 12;
+std::cout &lt;&lt; &amp;x; // adresse de x</pre></div>
+      <div class="info-box"><code>&amp;x</code> se lit « adresse de x ».</div>
+    </div>
+
+    <!-- Slide 9 -->
+    <div class="slide">
+      <h2>Declarer un pointeur</h2>
+      <div class="code-example"><pre>int* p = nullptr;
+double *q = nullptr;
+int a = 5;
+p = &amp;a; // p regarde a</pre></div>
+      <div class="info-box">Toujours initialiser (souvent a <code>nullptr</code>).</div>
+    </div>
+
+    <!-- Slide 10 -->
+    <div class="slide">
+      <h2>Dereferencer</h2>
+      <div class="code-example"><pre>int a = 7;
+int* p = &amp;a;
+std::cout &lt;&lt; *p; // lit 7
+*p = 9;           // modifie a
+std::cout &lt;&lt; a;  // 9</pre></div>
+      <div class="info-box">Suivre la fleche du pointeur.</div>
+    </div>
+
+    <!-- Slide 11 -->
+    <div class="slide">
+      <h2>Changer via pointeur</h2>
+      <div class="code-example"><pre>void set_to_zero(int* p){
+  if (p) *p = 0;
+}
+int score = 15;
+set_to_zero(&amp;score); // score devient 0</pre></div>
+    </div>
+
+    <!-- Slide 12 -->
+    <div class="slide">
+      <h2>nullptr & pointeur sauvage</h2>
+      <ul>
+        <li><code>nullptr</code> = ne pointe vers rien, doit etre teste</li>
+        <li>Pointeur sauvage = non initialise ou deja libere</li>
+        <li>Ne jamais dereferencer un pointeur non verifie</li>
+      </ul>
+    </div>
+
+    <!-- Slide 13 -->
+    <div class="slide">
+      <h2>Pointeur non initialise</h2>
+      <div class="code-example"><pre>int* p;      // valeur aleatoire
+// *p = 3;  // 🚫 crash possible
+p = nullptr; // ✅ testable</pre></div>
+    </div>
+
+    <!-- Slide 14 -->
+    <div class="slide">
+      <h2>Dangling pointer</h2>
+      <div class="code-example"><pre>int* bad(){
+  int x = 5;
+  return &amp;x; // 🚫 x detruit apres la fonction
+}</pre></div>
+      <div class="code-example"><pre>// PILE pendant bad()
+// | x=5 (adresse 0x7ff...) |
+// (sortie) bloc libere : &amp;x pointe vers du mort</pre></div>
+      <div class="info-box">Alternatives : <code>int good(){ return 5; }</code> ou <code>int* good(){ return new int(5); }</code> (a libérer).</div>
+    </div>
+
+    <!-- Slide 15 -->
+    <div class="slide">
+      <h2>Reference rappel</h2>
+      <div class="code-example"><pre>int n = 4;
+int&amp; ref = n; // alias
+ref += 1;     // n vaut 5
+// int&amp; r;   // 🚫 doit etre initialisee</pre></div>
+      <div class="info-box">Une reference ne se rebinde pas, n’est jamais nulle.</div>
+    </div>
+
+    <!-- Slide 16 -->
+    <div class="slide">
+      <h2>Optionnel ou obligatoire ?</h2>
+      <div class="code-example"><pre>void force_present(int&amp; r){ r = 10; }      // doit exister
+void peut_manquer(int* p){ if(p) *p = 10; } // peut etre nul</pre></div>
+      <div class="info-box">Reference si obligatoire; pointeur si optionnel (<code>nullptr</code> admis).</div>
+    </div>
+
+    <!-- Slide 17 -->
+    <div class="slide">
+      <h2>Choisir valeur / &amp; / *</h2>
+      <ul>
+        <li>Copie independante : <code>T</code></li>
+        <li>Modifier existant : <code>T&amp;</code></li>
+        <li>Lire sans copier un gros objet : <code>const T&amp;</code></li>
+        <li>Optionnel : <code>T*</code> + <code>if(p)</code></li>
+      </ul>
+    </div>
+
+    <!-- Slide 18 -->
+    <div class="slide">
+      <h2>Exemple swap</h2>
+      <div class="code-example"><pre>void swap_ref(int&amp; a, int&amp; b){
+  int t=a; a=b; b=t;
+}
+void swap_ptr(int* a, int* b){
+  if(!a || !b) return;
+  int t=*a; *a=*b; *b=t;
+}</pre></div>
+    </div>
+
+    <!-- Slide 19 -->
+    <div class="slide">
+      <h2>Parametre sortie</h2>
+      <div class="code-example"><pre>bool diviser(double a, double b, double&amp; res){
+  if (b==0) return false;
+  res = a/b; return true;
+}</pre></div>
+      <div class="info-box">Sortie garantie → reference.</div>
+    </div>
+
+    <!-- Slide 20 -->
+    <div class="slide">
+      <h2>Sortie optionnelle</h2>
+      <div class="code-example"><pre>bool diviser_opt(double a, double b, double* out){
+  if (!out || b==0) return false;
+  *out = a/b; return true;
+}</pre></div>
+      <div class="info-box">Optionnel → pointeur + test.</div>
+    </div>
+
+    <!-- Slide 21 -->
+    <div class="slide">
+      <h2>Tableau ⇒ pointeur</h2>
+      <div class="code-example"><pre>int t[4] = {1,2,3,4};
+int* p = t;     // = &amp;t[0]
+std::cout &lt;&lt; p[2]; // 3</pre></div>
+    </div>
+
+    <!-- Slide 22 -->
+    <div class="slide">
+      <h2>t[i] == *(t+i)</h2>
+      <div class="code-example"><pre>int t[3]={10,20,30};
+int* p = t;
+int a = t[1];    // 20
+int b = *(p+1);  // 20</pre></div>
+      <div class="info-box">Choisir la notation lisible.</div>
+    </div>
+
+    <!-- Slide 23 -->
+    <div class="slide">
+      <h2>Avancer le pointeur</h2>
+      <div class="code-example"><pre>int t[5]={0,1,2,3,4};
+int* p = t;
+++p;       // t[1]
+p += 2;   // t[3]</pre></div>
+      <div class="info-box">+1 avance d’un element (pas d’un octet).</div>
+    </div>
+
+    <!-- Slide 24 -->
+    <div class="slide">
+      <h2>Visuel deplacement</h2>
+      <div class="code-example"><pre>// t : [10][20][30][40]
+//      ^t        ^t+2
+int* p = t;    // 10
+p = p + 1;     // 20
+*(p+1);        // lit 30</pre></div>
+    </div>
+
+    <!-- Slide 25 -->
+    <div class="slide">
+      <h2>Adresses qui bougent</h2>
+      <div class="code-example"><pre>int t[3]={5,6,7};
+std::cout &lt;&lt; &amp;t[0] &lt;&lt; "\n";
+std::cout &lt;&lt; &amp;t[1] &lt;&lt; "\n";</pre></div>
+      <div class="info-box">Espacement fixe: souvent +4 octets entre deux <code>int</code>.</div>
+    </div>
+
+    <!-- Slide 26 -->
+    <div class="slide">
+      <h2>Bornes du tableau</h2>
+      <div class="code-example"><pre>int t[3]={1,2,3};
+int* fin = t + 3; // juste apres
+for(int* p=t; p!=fin; ++p){
+  std::cout &lt;&lt; *p;
+}</pre></div>
+      <div class="info-box">Zone valide: <code>[t, t+n]</code>. <code>t+n</code> sert de marqueur fin, on ne le dereference pas.</div>
+    </div>
+
+    <!-- Slide 27 -->
+    <div class="slide">
+      <h2>Parcours par pointeur</h2>
+      <div class="code-example"><pre>void afficher(const int* debut, int n){
+  const int* fin = debut + n;
+  for(const int* p = debut; p != fin; ++p){
+    std::cout &lt;&lt; *p &lt;&lt; ' ';
+  }
+}</pre></div>
+    </div>
+
+    <!-- Slide 28 -->
+    <div class="slide">
+      <h2>Recherche adresse</h2>
+      <div class="code-example"><pre>int* find(int* t, int n, int cible){
+  for(int i=0;i&lt;n;++i) if (t[i]==cible) return &amp;t[i];
+  return nullptr;
+}</pre></div>
+      <div class="info-box">Renvoie <code>nullptr</code> si absent.</div>
+    </div>
+
+    <!-- Slide 29 -->
+    <div class="slide">
+      <h2>Tableaux 2D fixes</h2>
+      <div class="code-example"><pre>void print2(const int m[][3], int rows){
+  for(int i=0;i&lt;rows;++i){
+    for(int j=0;j&lt;3;++j) std::cout &lt;&lt; m[i][j] &lt;&lt; ' ';
+    std::cout &lt;&lt; "\n";
+  }
+}
+int M[2][3]={{1,2,3},{4,5,6}};</pre></div>
+      <div class="info-box">La 2e dimension doit etre connue.</div>
+    </div>
+
+    <!-- Slide 30 -->
+    <div class="slide">
+      <h2>2D : memoire en ligne</h2>
+      <div class="code-example"><pre>// int M[2][3] = { {1,2,3}, {4,5,6} };
+// Contigu en memoire (row-major):
+// [1][2][3][4][5][6]
+//  ^M[0][0] ...       ^M[1][2]
+</pre></div>
+    </div>
+
+    <!-- Slide 31 -->
+    <div class="slide">
+      <h2>Fixer la 2e dimension</h2>
+      <div class="code-example"><pre>const int COLS = 3;
+void print2(const int m[][COLS], int rows);
+// COLS connu ⇒ peut « sauter » la bonne longueur</pre></div>
+      <div class="info-box">Astuce: poser <code>COLS</code> en <code>const int</code>.</div>
+    </div>
+
+    <!-- Slide 32 -->
+    <div class="slide">
+      <h2>2D dynamique simple</h2>
+      <div class="code-example"><pre>#include &lt;vector&gt;
+std::vector&lt;std::vector&lt;int&gt;&gt; mat(2, std::vector&lt;int&gt;(3, 0));
+mat[1][2] = 9; // pas de delete</pre></div>
+      <div class="info-box">Ou un seul vector 1D avec index <code>i*cols + j</code>.</div>
+    </div>
+
+    <!-- Slide 33 -->
+    <div class="slide">
+      <h2>Chaines en C</h2>
+      <div class="code-example"><pre>char s[] = "Salut"; // 6 cases avec '\0'
+const char* p = s;
+std::cout &lt;&lt; p; // affiche Salut</pre></div>
+    </div>
+
+    <!-- Slide 34 -->
+    <div class="slide">
+      <h2>Piège du '\\0'</h2>
+      <div class="code-example"><pre>char s[5] = {'H','e','l','l','o'}; // 🚫 pas de '\0'
+std::cout &lt;&lt; s; // lit au-dela, imprevisible</pre></div>
+      <div class="info-box">Toujours reserver la case pour <code>'\\0'</code>.</div>
+    </div>
+
+    <!-- Slide 35 -->
+    <div class="slide">
+      <h2>Preferer std::string</h2>
+      <div class="code-example"><pre>std::string nom = "Ada";
+nom += " Lovelace";</pre></div>
+      <div class="info-box">Pas de gestion manuelle du <code>'\\0'</code>.</div>
+    </div>
+
+    <!-- Slide 36 -->
+    <div class="slide">
+      <h2>Const et pointeur</h2>
+      <div class="code-example"><pre>const int* p;        // lit des int
+int* const q=nullptr; // q fixe, int modifiable
+const int* const r=nullptr; // tout figé
+int const * s; // identique a const int*</pre></div>
+    </div>
+
+    <!-- Slide 37 -->
+    <div class="slide">
+      <h2>Const &amp; references</h2>
+      <div class="code-example"><pre>void afficher(const std::string&amp; s){
+  std::cout &lt;&lt; s;
+}</pre></div>
+      <div class="info-box">Lit sans copier, ne modifie pas.</div>
+    </div>
+
+    <!-- Slide 38 -->
+    <div class="slide">
+      <h2>Pointeur sur struct</h2>
+      <div class="code-example"><pre>struct Point { double x, y; };
+Point p{1.0, 2.0};
+Point* ptr = &amp;p;
+ptr-&gt;x = 3.5; // modifie p.x</pre></div>
+    </div>
+
+    <div class="controls">
+      <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+      <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">38</span></span>
+      <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+    </div>
+  </div>
+
+  <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

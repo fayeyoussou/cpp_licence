@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atelier Pointeurs 2 — Pièges & pratique</title>
+  <link rel="stylesheet" href="assets/css/cpp_intro.css">
+  <meta name="description" content="Atelier pointeurs C/C++ : pieges courants, new/delete, debogage, exercices et corrections.">
+</head>
+<body>
+  <div class="presentation-container">
+    <a class="back-link" href="index.html">← Retour au menu</a>
+
+    <!-- Slide 1 -->
+    <div class="slide active title-slide">
+      <h1>Pointeurs — Atelier 2</h1>
+      <p class="subtitle">Pièges, gestion memoire, exercices</p>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="slide">
+      <h2>Objectifs</h2>
+      <ul>
+        <li>Identifier et corriger les pieges classiques</li>
+        <li>new/delete : quoi faire, quoi eviter</li>
+        <li>Bornes, +1, chaines C, 2D : erreurs typiques</li>
+        <li>Habitudes de debug et check-list</li>
+        <li>Exercices avec solutions</li>
+      </ul>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide">
+      <h2>Reflexes de base</h2>
+      <ul>
+        <li>Initialiser a <code>nullptr</code></li>
+        <li>Tester <code>if(p)</code> avant <code>*p</code></li>
+        <li>Un seul responsable de la libération</li>
+        <li>Rester dans les bornes des tableaux</li>
+      </ul>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="slide">
+      <h2>Dangling pointer</h2>
+      <div class="code-example"><pre>int* bad(){
+  int x = 5;
+  return &amp;x; // x detruit a la sortie
+}</pre></div>
+      <div class="code-example"><pre>// PILE pendant bad() : | x=5 |
+// sortie : frame retiree, &amp;x pointe vers du mort</pre></div>
+      <div class="info-box">Corriger : retourner la valeur, ou allouer sur le tas et libérer ensuite.</div>
+    </div>
+
+    <!-- Slide 5 -->
+    <div class="slide">
+      <h2>Optionnel vs obligatoire</h2>
+      <div class="code-example"><pre>void force_present(int&amp; r){ r = 10; }
+void peut_manquer(int* p){ if(p) *p = 10; }</pre></div>
+      <div class="info-box">Reference = jamais nulle; pointeur = peut etre <code>nullptr</code>, toujours tester.</div>
+    </div>
+
+    <!-- Slide 6 -->
+    <div class="slide">
+      <h2>Off-by-one</h2>
+      <div class="code-example"><pre>int t[3]={1,2,3};
+int* fin = t + 3; // one-past-end
+for(int* p=t; p!=fin; ++p){ std::cout &lt;&lt; *p; }</pre></div>
+      <div class="info-box">Ne jamais acceder a <code>t+3</code>, c’est juste un marqueur de fin.</div>
+    </div>
+
+    <!-- Slide 7 -->
+    <div class="slide">
+      <h2>Chaine C sans '\\0'</h2>
+      <div class="code-example"><pre>char s[5] = {'H','e','l','l','o'}; // 🚫 pas de '\\0'
+std::cout &lt;&lt; s; // lit au-dela</pre></div>
+      <div class="info-box">Toujours la case du <code>'\\0'</code> ou utiliser <code>std::string</code>.</div>
+    </div>
+
+    <!-- Slide 8 -->
+    <div class="slide">
+      <h2>new/delete (pedago)</h2>
+      <div class="code-example"><pre>int* p = new int(5);
+// ...
+delete p; p=nullptr;</pre></div>
+      <div class="info-box">A utiliser rarement; preferer <code>std::vector</code>/<code>std::unique_ptr</code>.</div>
+    </div>
+
+    <!-- Slide 9 -->
+    <div class="slide">
+      <h2>new[] / delete[]</h2>
+      <div class="code-example"><pre>int* t = new int[3]{1,2,3};
+// ...
+delete[] t; t = nullptr;</pre></div>
+      <div class="info-box">Ne jamais mélanger <code>new</code> avec <code>delete[]</code>.</div>
+    </div>
+
+    <!-- Slide 10 -->
+    <div class="slide">
+      <h2>Pièges de gestion</h2>
+      <ul>
+        <li>Fuite: oubli de <code>delete</code> → memoire garde</li>
+        <li>Double delete: meme adresse liberee deux fois</li>
+        <li>Mélange <code>new</code>/<code>free</code> ou <code>malloc</code>/<code>delete</code></li>
+      </ul>
+      <div class="info-box">Antidotes : un seul proprietaire ou <code>std::unique_ptr</code>; remettre a <code>nullptr</code> apres <code>delete</code>; ne pas mélanger les familles.</div>
+    </div>
+
+    <!-- Slide 11 -->
+    <div class="slide">
+      <h2>Exemple de fuite</h2>
+      <div class="code-example"><pre>void f(){
+  int* p = new int(5);
+  // ... on oublie delete p;
+} // fuite</pre></div>
+      <div class="info-box">Solution : <code>delete p;</code> ou <code>auto p = std::make_unique&lt;int&gt;(5);</code></div>
+    </div>
+
+    <!-- Slide 12 -->
+    <div class="slide">
+      <h2>Exemple double delete</h2>
+      <div class="code-example"><pre>int* p = new int(7);
+delete p;
+// ...
+delete p; // 🚫 meme adresse</pre></div>
+      <div class="info-box">Remettre a <code>nullptr</code> ou laisser <code>unique_ptr</code> gerer.</div>
+    </div>
+
+    <!-- Slide 13 -->
+    <div class="slide">
+      <h2>Mélange interdit</h2>
+      <div class="code-example"><pre>int* p = (int*)malloc(4); // C
+// delete p; // 🚫 interdit
+free(p);     // ✅ avec malloc
+
+int* q = new int(3);
+// free(q); // 🚫 interdit
+delete q;    // ✅ avec new</pre></div>
+    </div>
+
+    <!-- Slide 14 -->
+    <div class="slide">
+      <h2>Préférer std::vector</h2>
+      <div class="code-example"><pre>#include &lt;vector&gt;
+std::vector&lt;int&gt; v = {1,2,3};
+v.push_back(4); // pas de delete</pre></div>
+      <div class="info-box">Evite fuites et double delete.</div>
+    </div>
+
+    <!-- Slide 15 -->
+    <div class="slide">
+      <h2>std::unique_ptr (simple)</h2>
+      <div class="code-example"><pre>#include &lt;memory&gt;
+auto p = std::make_unique&lt;int&gt;(42);
+// detruit automatiquement</pre></div>
+      <div class="info-box">Un seul proprietaire → moins de pieges.</div>
+    </div>
+
+    <!-- Slide 16 -->
+    <div class="slide">
+      <h2>Outils anti-piege</h2>
+      <ul>
+        <li><code>if(p)</code>, <code>assert(p)</code> pour preconditions</li>
+        <li>Afficher adresse + valeur en debug</li>
+        <li>Sanitizers/valgrind (si dispo) pour deteceter fuites/UAF</li>
+      </ul>
+    </div>
+
+    <!-- Slide 17 -->
+    <div class="slide">
+      <h2>Fiche reflexe</h2>
+      <ul>
+        <li>Initialiser, tester</li>
+        <li>Un seul delete, jamais double</li>
+        <li>Pas de mélange <code>new</code>/<code>free</code></li>
+        <li>Rester dans les bornes</li>
+        <li>Préferer <code>std::vector</code>, <code>std::string</code>, <code>std::unique_ptr</code></li>
+      </ul>
+    </div>
+
+    <!-- Slide 18 -->
+    <div class="slide">
+      <h2>Défi : somme</h2>
+      <div class="code-example"><pre>int somme(const int* t, int n){
+  // TODO: retourner la somme
+}</pre></div>
+    </div>
+
+    <!-- Slide 19 -->
+    <div class="slide">
+      <h2>Solution somme</h2>
+      <div class="code-example"><pre>int somme(const int* t, int n){
+  int s = 0;
+  const int* fin = t + n;
+  for(const int* p = t; p != fin; ++p) s += *p;
+  return s;
+}</pre></div>
+    </div>
+
+    <!-- Slide 20 -->
+    <div class="slide">
+      <h2>Défi : copie securisee</h2>
+      <div class="code-example"><pre>void copie10(int* dest, const int* src){
+  for(int i=0;i&lt;10;++i) dest[i] = src[i];
+}</pre></div>
+      <div class="info-box">Ajouter des gardes simples.</div>
+    </div>
+
+    <!-- Slide 21 -->
+    <div class="slide">
+      <h2>Solution copie</h2>
+      <div class="code-example"><pre>bool copie10(int* dest, const int* src){
+  if(!dest || !src) return false;
+  for(int i=0;i&lt;10;++i) dest[i] = src[i];
+  return true;
+}</pre></div>
+    </div>
+
+    <div class="controls">
+      <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+      <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">21</span></span>
+      <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+    </div>
+  </div>
+
+  <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

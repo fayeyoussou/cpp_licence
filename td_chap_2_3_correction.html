@@ -1,28 +1,267 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Corrigé — TD Chapitres 2–3</title>
-  <link rel="stylesheet" href="assets/css/cpp_intro.css">
-  <meta name="robots" content="noindex">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrigé — TD Chapitres 2–3 (Algo, Logique, Fonctions)</title>
+    <link rel="stylesheet" href="assets/css/cpp_intro.css">
+    <meta name="description" content="Corrigé détaillé des 10 exercices: explications, étapes, complexités et implémentations C++17.">
+    <meta name="robots" content="noindex">
 </head>
 <body>
-  <div class="presentation-container">
+<div class="presentation-container">
     <a class="back-link" href="index.html">← Retour au menu</a>
 
+    <!-- Slide 1: Titre -->
     <div class="slide active title-slide">
-      <h1>Corrigé — TD 2–3</h1>
-      <p class="subtitle">Le corrigé sera bientôt disponible. Merci de votre patience.</p>
+        <h1>Corrigé — TD 2–3</h1>
+        <p class="subtitle">Explications claires + implémentations C++</p>
     </div>
 
+    <!-- Ex 1 -->
+    <div class="slide">
+        <h2>Ex 1 — Note → Lettre</h2>
+        <p>Idée: vérifier l’intervalle, puis tester de la plus grande borne vers la plus petite pour éviter les chevauchements.</p>
+        <div class="code-example"><pre>#include &lt;iostream&gt;
+
+char grade_from_20(double note) {
+    if (note &lt; 0.0 || note &gt; 20.0) return '?';
+    if (note &gt;= 16.0) return 'A';
+    if (note &gt;= 14.0) return 'B';
+    if (note &gt;= 12.0) return 'C';
+    if (note &gt;= 10.0) return 'D';
+    return 'E';
+}
+
+// Complexité: O(1). Cas limites: 0, 10, 12, 14, 16, 20.
+</pre></div>
+        <div class="info-box">Piège: bien respecter « inclusif » sur les bornes hautes et basses selon l’énoncé.</div>
+    </div>
+
+    <!-- Ex 2 -->
+    <div class="slide">
+        <h2>Ex 2 — Mini‑calculatrice</h2>
+        <p>Idée: utiliser <code>switch(op)</code>. Gérer les divisions par 0 et opérateur inconnu via un booléen.</p>
+        <div class="code-example"><pre>#include &lt;iostream&gt;
+
+bool calculer(double a, char op, double b, double&amp; out) {
+    switch (op) {
+        case '+': out = a + b; return true;
+        case '-': out = a - b; return true;
+        case '*': out = a * b; return true;
+        case '/': if (b != 0.0) { out = a / b; return true; } else return false;
+        default:  return false;
+    }
+}
+
+// Complexité: O(1). Vérifier l'entrée: 3 + 4 → 7 ; 5 / 0 → erreur.
+</pre></div>
+        <div class="info-box">Piège: vérifier <code>b != 0</code> avant la division.</div>
+    </div>
+
+    <!-- Ex 3 -->
+    <div class="slide">
+        <h2>Ex 3 — Classifier une suite</h2>
+        <p>Idée: un seul passage en calculant des drapeaux <code>has_lt</code>, <code>has_gt</code>, <code>has_eq</code> puis décider.</p>
+        <div class="code-example"><pre>#include &lt;cstring&gt;
+
+const char* classify(const int t[], int n) {
+    if (n &lt;= 1) return "CONSTANTE";
+    bool has_lt = false, has_gt = false, has_eq = false;
+    for (int i = 0; i + 1 &lt; n; ++i) {
+        if (t[i] &lt; t[i+1]) has_lt = true;
+        else if (t[i] &gt; t[i+1]) has_gt = true;
+        else has_eq = true;
+    }
+    if (!has_lt &amp;&amp; !has_gt) return "CONSTANTE";
+    if (has_lt &amp;&amp; !has_gt &amp;&amp; !has_eq) return "STRICT_INC";
+    if (has_lt &amp;&amp; !has_gt &amp;&amp; has_eq)  return "NON_DEC";
+    if (has_gt &amp;&amp; !has_lt &amp;&amp; !has_eq) return "STRICT_DEC";
+    if (has_gt &amp;&amp; !has_lt &amp;&amp; has_eq)  return "NON_INC";
+    return "AUCUNE";
+}
+
+// Complexité: O(n). Ne modifie pas le tableau.
+</pre></div>
+        <div class="info-box">Piège: NON_DEC ≠ STRICT_INC (au moins une égalité).</div>
+    </div>
+
+    <!-- Ex 4 -->
+    <div class="slide">
+        <h2>Ex 4 — Deux indices somme = cible</h2>
+        <p>Idée: solution simple en O(n²) avec double boucle, retourner la première paire (i, j) trouvée avec i&lt;j.</p>
+        <div class="code-example"><pre>#include &lt;iostream&gt;
+
+bool two_sum(const int t[], int n, int cible, int&amp; i, int&amp; j) {
+    if (n &lt; 2) return false;
+    for (int a = 0; a &lt; n; ++a) {
+        for (int b = a + 1; b &lt; n; ++b) {
+            if (t[a] + t[b] == cible) { i = a; j = b; return true; }
+        }
+    }
+    return false;
+}
+
+// Complexité: O(n^2). Bonus: O(n log n) (tri copie) ou O(n) (table de hachage).
+</pre></div>
+        <div class="info-box">Piège: imposer j &gt; i; gérer n&lt;2; valeurs négatives permises.</div>
+    </div>
+
+    <!-- Ex 5 -->
+    <div class="slide">
+        <h2>Ex 5 — Doublons consécutifs (in‑place)</h2>
+        <p>Idée: pointeur d’écriture <code>write</code> qui garde le dernier élément unique vu.</p>
+        <div class="code-example"><pre>#include &lt;iostream&gt;
+
+int unique_compact(int t[], int n) {
+    if (n == 0) return 0;
+    int write = 1;
+    for (int i = 1; i &lt; n; ++i) {
+        if (t[i] != t[write - 1]) t[write++] = t[i];
+    }
+    return write;
+}
+
+// Complexité: O(n). In-place. Ne traite que les doublons CONSÉCUTIFS.
+</pre></div>
+        <div class="info-box">Piège: comparer à t[write-1] (dernier gardé), pas à t[i-1] après écriture.</div>
+    </div>
+
+    <!-- Ex 6 -->
+    <div class="slide">
+        <h2>Ex 6 — Palindrome robuste</h2>
+        <p>Idée: deux indices, ignorer non‑alphanumériques, comparer en minuscule. Pas de copie.</p>
+        <div class="code-example"><pre>#include &lt;cctype&gt;
+#include &lt;string&gt;
+
+static inline unsigned char uch(char c){ return static_cast<unsigned char>(c); }
+
+bool palindrome(const std::string&amp; s) {
+    int i = 0, j = int(s.size()) - 1;
+    while (i &lt; j) {
+        while (i &lt; j &amp;&amp; !std::isalnum(uch(s[i]))) ++i;
+        while (i &lt; j &amp;&amp; !std::isalnum(uch(s[j]))) --j;
+        if (std::tolower(uch(s[i])) != std::tolower(uch(s[j]))) return false;
+        ++i; --j;
+    }
+    return true;
+}
+
+// Complexité: O(n). Fonctionne sur ASCII (pré‑requis de l’énoncé).
+</pre></div>
+        <div class="info-box">Piège: caster en <code>unsigned char</code> avant <code>std::tolower</code>/<code>std::isalnum</code>.</div>
+    </div>
+
+    <!-- Ex 7 -->
+    <div class="slide">
+        <h2>Ex 7 — Encodage RLE</h2>
+        <p>Idée: parcourir la chaîne, compter les répétitions, pousser caractère + compteur.</p>
+        <div class="code-example"><pre>#include &lt;string&gt;
+
+std::string rle_encode(const std::string&amp; s) {
+    if (s.empty()) return "";
+    std::string out; out.reserve(s.size() * 2);
+    char cur = s[0]; int cnt = 1;
+    for (size_t i = 1; i &lt; s.size(); ++i) {
+        if (s[i] == cur) { ++cnt; }
+        else { out += cur; out += std::to_string(cnt); cur = s[i]; cnt = 1; }
+    }
+    out += cur; out += std::to_string(cnt);
+    return out;
+}
+
+// Complexité: O(n). Entrée attendue: A–Z selon l’énoncé.
+</pre></div>
+        <div class="info-box">Piège: ajouter le dernier groupe après la boucle.</div>
+    </div>
+
+    <!-- Ex 8 -->
+    <div class="slide">
+        <h2>Ex 8 — Point selle (matrice)</h2>
+        <p>Idée: pour chaque ligne, trouver les colonnes du minimum de ligne puis vérifier si ce minimum est ≥ à tous les éléments de sa colonne.</p>
+        <div class="code-example"><pre>#include &lt;limits&gt;
+
+const int MAXC = 50;
+
+bool saddle_point(const int M[][MAXC], int rows, int cols, int&amp; r, int&amp; c) {
+    for (int i = 0; i &lt; rows; ++i) {
+        // Trouver la valeur min de la ligne i
+        int minv = M[i][0];
+        for (int j = 1; j &lt; cols; ++j) if (M[i][j] &lt; minv) minv = M[i][j];
+        // Pour chaque j où M[i][j] == minv, vérifier colonne max
+        for (int j = 0; j &lt; cols; ++j) if (M[i][j] == minv) {
+            bool max_col = true;
+            for (int k = 0; k &lt; rows; ++k) if (M[k][j] &gt; M[i][j]) { max_col = false; break; }
+            if (max_col) { r = i; c = j; return true; }
+        }
+    }
+    return false;
+}
+
+// Complexité: O(rows * cols * rows) dans la version naïve ci‑dessus (souvent ok pour petites tailles).
+</pre></div>
+        <div class="info-box">Piège: la 2ᵉ dimension du paramètre doit être connue au compile‑time en C++ pour les tableaux C.</div>
+    </div>
+
+    <!-- Ex 9 -->
+    <div class="slide">
+        <h2>Ex 9 — clip et clamp_inplace</h2>
+        <p>Idée: bornes inclusives, valeurs par défaut UNIQUEMENT en déclaration (header). Surcharge int/double.</p>
+        <div class="code-example"><pre>// clip.hpp
+#pragma once
+int    clip(int x, int min = 0, int max = 100);
+double clip(double x, double min = 0.0, double max = 100.0);
+void   clamp_inplace(int&amp; x, int min = 0, int max = 100);
+
+// clip.cpp
+#include "clip.hpp"
+int clip(int x, int min, int max) {
+    if (x &lt; min) return min; if (x &gt; max) return max; return x;
+}
+double clip(double x, double min, double max) {
+    if (x &lt; min) return min; if (x &gt; max) return max; return x;
+}
+void clamp_inplace(int&amp; x, int min, int max) {
+    if (x &lt; min) x = min; else if (x &gt; max) x = max;
+}
+
+// Complexité: O(1). Précondition: min ≤ max.
+</pre></div>
+        <div class="info-box">Pièges: valeurs par défaut dans le header uniquement; bornes incluses; même nom « clip » pour surcharge.</div>
+    </div>
+
+    <!-- Ex 10 -->
+    <div class="slide">
+        <h2>Ex 10 — Mini‑lib tableau</h2>
+        <p>Idée: séparer proprement <code>.hpp</code> (déclarations) et <code>.cpp</code> (définitions). Implémentations simples et sûres.</p>
+        <div class="code-example"><pre>// array_utils.hpp
+#pragma once
+bool is_sorted_non_decreasing(const int t[], int n);
+void swap_ref(int&amp; a, int&amp; b);
+void reverse_inplace(int t[], int n);
+int  lower_bound(const int t[], int n, int cible);
+
+// array_utils.cpp
+#include "array_utils.hpp"
+bool is_sorted_non_decreasing(const int t[], int n){ for(int i=0;i+1&lt;n;++i) if(t[i]&gt;t[i+1]) return false; return true; }
+void swap_ref(int&amp; a, int&amp; b){ int tmp=a; a=b; b=tmp; }
+void reverse_inplace(int t[], int n){ for(int i=0,j=n-1;i<j;++i,--j) swap_ref(t[i], t[j]); }
+int lower_bound(const int t[], int n, int cible){ int g=0,d=n; while(g<d){ int m=g+(d-g)/2; if(t[m]>=cible) d=m; else g=m+1; } return g; }
+
+// Complexités: O(n), O(1), O(n), O(log n) respectivement.
+</pre></div>
+        <div class="info-box">Pièges: ne pas mettre « using namespace std; » dans un header; utiliser l’intervalle [g,d) pour le binaire.</div>
+    </div>
+
+    <!-- Controls -->
     <div class="controls">
-      <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
-      <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">1</span></span>
-      <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+        <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+        <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">12</span></span>
+        <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
     </div>
-  </div>
+</div>
 
-  <script src="assets/js/cpp_intro.js"></script>
+<script src="assets/js/cpp_intro.js"></script>
 </body>
 </html>
+

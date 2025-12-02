@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TD — Pointeurs & Couture (Atelier de Dakar)</title>
+  <link rel="stylesheet" href="assets/css/cpp_intro.css">
+  <meta name="description" content="Travaux dirigés progressifs sur pointeurs, références et tableaux, autour d'un atelier de couture à Dakar.">
+  <meta name="robots" content="noindex">
+</head>
+<body>
+  <div class="presentation-container">
+    <a class="back-link" href="index.html">← Retour au menu</a>
+
+    <div class="slide active title-slide">
+      <h1>TD — Pointeurs &amp; Couture</h1>
+      <p class="subtitle">Atelier de Dakar : mesures, tissus, clients, coupes</p>
+    </div>
+
+    <div class="slide">
+      <h2>Contexte &amp; objectifs</h2>
+      <ul>
+        <li>Atelier de couture à Dakar (boubous, wax, bazin) qui prépare une mini-collection.</li>
+        <li>Fil rouge : suivre la même commande client/stock au long des exercices.</li>
+        <li>Focus : pointeurs, références, parcours de tableaux (statique et dynamique), 2D simple.</li>
+        <li>Pas de STL avancée (<code>vector</code>/tri maison autorisés), pas d’algorithmes fournis.</li>
+        <li>Compiler C++17, fichier unique conseillé (<code>td_pointeurs_couture.cpp</code>).</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Fil rouge &amp; contraintes</h2>
+      <ul>
+        <li>Clients : Awa, Mame, Khadim (3 premiers) puis Baye, Rokhaya (ajoutés plus tard).</li>
+        <li>Tissus : wax largeur 1.40 m, bazin largeur 1.50 m, brodé largeur 1.20 m.</li>
+        <li>Vous devez afficher après chaque exercice : données avant/après et adresses clés (pointeurs).</li>
+        <li>Gardez les mêmes structures sur tout le TD; ne dupliquez pas les données inutilement.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Données de base</h2>
+      <div class="code-example"><pre>struct Client {
+    std::string nom;
+    double tour_poitrine;   // cm
+    double longueur_boubou; // cm
+};
+
+struct Rouleau {
+    std::string tissu; // "wax", "bazin"
+    double largeur;    // m
+    double longueur;   // m
+};</pre></div>
+      <div class="info-box">Utilisez pointeurs/références pour modifier ces structures sans copie.</div>
+    </div>
+
+    <div class="slide">
+      <h2>Exo 1 — Étalonner le ruban</h2>
+      <ul>
+        <li>Scénario : la chaleur a détendu le ruban (il manque 0.8 cm). Le tailleur doit le recalibrer avant de mesurer Awa.</li>
+        <li>Mesure brute d’Awa = 152.4 cm, correction +0.8 cm.</li>
+        <li>Ici « étalonner » = recalculer la vraie mesure : <code>ruban</code> contient la mesure lue, on ajoute <code>correction</code> (calibration).</li>
+        <li>Fonction <code>void etalonner(double* ruban, double correction)</code></li>
+        <li>Afficher la valeur avant/après et l’adresse du ruban (<code>ruban</code>).</li>
+        <li>Sortie attendue : ligne explicite (« ruban +0.8 cm, passe de 152.4 à 153.2 @adresse »).</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Exo 2 — Mesures clients (références)</h2>
+      <ul>
+        <li>Scénario : avant le grand baptême du week-end, le tailleur ajuste trois tenues pour éviter les retouches de dernière minute.</li>
+        <li>Tableau statique de 3 clients : Awa (152.4 / 145), Mame (158 / 148), Khadim (165 / 150).</li>
+        <li>Fonction <code>void ajuster_longueur(Client&amp; c, double ourlet)</code> : ourlet -2 cm pour Awa, +1 cm pour Mame, 0 pour Khadim.</li>
+        <li>Parcourir avec un pointeur (<code>Client* p = clients;</code>) et incrémenter pour toucher chaque client.</li>
+        <li>Afficher un tableau final « nom | longueur | adresse » pour vérifier le passage par référence.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Exo 3 — Surface des rouleaux</h2>
+      <ul>
+        <li>Scénario : deux clientes veulent des boubous assortis; le tailleur mesure ce qui reste en stock pour ne pas promettre l’impossible.</li>
+        <li>Allouer dynamiquement 3 rouleaux : wax 1.40 m × 12 m, bazin 1.50 m × 10 m, brodé 1.20 m × 8 m.</li>
+        <li>Fonction <code>double surface(const Rouleau* r)</code> qui renvoie <code>largeur * longueur</code>, protège <code>nullptr</code>.</li>
+        <li>Calculer la surface totale avec arithmétique de pointeurs (<code>for (Rouleau* p = stock; p &lt; stock + n; ++p)</code>).</li>
+        <li>Afficher la surface par rouleau (nom, surface, adresse) + total, puis <code>delete[] stock</code>.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Exo 4 — Découpe en bandes</h2>
+      <ul>
+        <li>Scénario : une cliente commande une tenue avec 4 empiècements identiques en bazin; il faut tout couper sans gaspiller.</li>
+        <li>On coupe le rouleau de bazin en 4 bandes demandées : 3 m, 3 m, 3 m, 3 m.</li>
+        <li>Fonction <code>void decouper(Rouleau&amp; r, double* bandes, int nbBandes)</code> qui remplit le tableau et réduit <code>r.longueur</code>.</li>
+        <li>Si la somme dépasse la longueur, la dernière bande est raccourcie pour « finir » le rouleau.</li>
+        <li>Utiliser uniquement l’arithmétique de pointeurs sur <code>bandes</code> (<code>*(bandes + i)</code>).</li>
+        <li>Affichage attendu : tailles réelles coupées + longueur restante du rouleau.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Exo 5 — Carnet de commandes (pointeurs de struct)</h2>
+      <ul>
+        <li>Scénario : pour planifier sa journée, le tailleur classe les commandes de la plus courte à la plus longue.</li>
+        <li>Créer un tableau dynamique de <code>Client*</code> pointant vers les 3 clients (pas de copie).</li>
+        <li>Trier ces pointeurs par <code>longueur_boubou</code> croissante (tri à bulles minimal).</li>
+        <li>Fonction <code>Client* chercher(Client** carnet, int n, const std::string&amp; nom)</code> : retourne le pointeur ou <code>nullptr</code>.</li>
+        <li>Tester la recherche pour « Mame » et « Rokhaya » (doit retourner <code>nullptr</code> pour la seconde).</li>
+        <li>Appliquer une remise de 2 cm à Mame via le pointeur retourné et réafficher le carnet trié.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Exo 6 — Plan de coupe (tableaux 2D)</h2>
+      <ul>
+        <li>Scénario : pour limiter les chutes, le tailleur simule un plan de coupe simplifié avant de poser le patron.</li>
+        <li>Patron simplifié 2D (cm) dans <code>int plan[4][5]</code> : ligne 0 = col, ligne 1 = devant, ligne 2 = dos, ligne 3 = manches.</li>
+        <li>Fonction <code>void pivoter(int (*m)[5], int lignes)</code> qui échange la première et la dernière ligne via pointeurs sur lignes.</li>
+        <li>Afficher le plan avant/après avec parcours double pointeur (<code>int (*row)[5] = m;</code>), puis expliquer ce qui a bougé.</li>
+        <li>Objectif : manipuler les adresses de lignes, pas copier la matrice.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Bonus — Sécurité &amp; créativité</h2>
+      <ul>
+        <li>Ajouter un mode « inventaire rapide » qui affiche toutes les adresses utiles (clients, rouleaux, bandes) pour visualiser la mémoire.</li>
+        <li>Tester vos fonctions avec des pointeurs nuls pour éviter les crashes (retour anticipé).</li>
+        <li>Proposer une variation locale (grand boubou, robe pagne, tenue sapeur) en jouant sur les longueurs/largeurs.</li>
+      </ul>
+    </div>
+
+    <div class="slide">
+      <h2>Livrables</h2>
+      <ul>
+        <li>Code unique, clair, commenté avec sobriété. Pas de fuite mémoire</li>
+
+      </ul>
+    </div>
+
+    <div class="controls">
+      <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+      <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">12</span></span>
+      <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+    </div>
+  </div>
+
+  <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

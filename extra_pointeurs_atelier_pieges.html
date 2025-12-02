@@ -101,9 +101,8 @@ delete[] t; t = nullptr;</pre></div>
       <ul>
         <li>Fuite: oubli de <code>delete</code> → memoire garde</li>
         <li>Double delete: meme adresse liberee deux fois</li>
-        <li>Mélange <code>new</code>/<code>free</code> ou <code>malloc</code>/<code>delete</code></li>
       </ul>
-      <div class="info-box">Antidotes : un seul proprietaire ou <code>std::unique_ptr</code>; remettre a <code>nullptr</code> apres <code>delete</code>; ne pas mélanger les familles.</div>
+      <div class="info-box">Antidotes : un seul proprietaire ou <code>std::unique_ptr</code>; remettre a <code>nullptr</code> apres <code>delete</code>.</div>
     </div>
 
     <!-- Slide 11 -->
@@ -128,14 +127,13 @@ delete p; // 🚫 meme adresse</pre></div>
 
     <!-- Slide 13 -->
     <div class="slide">
-      <h2>Mélange interdit</h2>
-      <div class="code-example"><pre>int* p = (int*)malloc(4); // C
-// delete p; // 🚫 interdit
-free(p);     // ✅ avec malloc
-
-int* q = new int(3);
-// free(q); // 🚫 interdit
-delete q;    // ✅ avec new</pre></div>
+      <h2>Tableau dynamique simple</h2>
+      <div class="code-example"><pre>int* t = new int[5]{1,2,3,4,5};
+for(int i=0; i&lt;5; ++i){
+  std::cout &lt;&lt; t[i] &lt;&lt; " ";
+}
+delete[] t; t = nullptr;</pre></div>
+      <div class="info-box">Toujours utiliser <code>delete[]</code> avec <code>new[]</code>.</div>
     </div>
 
     <!-- Slide 14 -->
@@ -162,7 +160,6 @@ auto p = std::make_unique&lt;int&gt;(42);
       <ul>
         <li><code>if(p)</code>, <code>assert(p)</code> pour preconditions</li>
         <li>Afficher adresse + valeur en debug</li>
-        <li>Sanitizers/valgrind (si dispo) pour deteceter fuites/UAF</li>
       </ul>
     </div>
 

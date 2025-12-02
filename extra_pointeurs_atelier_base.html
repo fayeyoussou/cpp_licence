@@ -68,6 +68,30 @@
 </pre></div>
     </div>
 
+    <!-- Slide 5b -->
+    <div class="slide">
+      <h2>Tableau comparatif pile / tas</h2>
+      <p>Pourquoi : bien choisir où vit votre donnée avant d’y accéder via pointeur.</p>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Critere</th>
+            <th>Pile (stack)</th>
+            <th>Tas (heap)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Gestion</td><td>Automatique</td><td>Manuelle</td></tr>
+          <tr><td>Rapidité</td><td>Très rapide</td><td>Plus lente</td></tr>
+          <tr><td>Taille</td><td>Petite</td><td>Grande</td></tr>
+          <tr><td>Durée de vie</td><td>Jusqu’à la fin du bloc/fonction</td><td>Jusqu’à <code>delete</code></td></tr>
+          <tr><td>Risques</td><td>Stack overflow</td><td>Fuite mémoire</td></tr>
+          <tr><td>Usage</td><td>Variables locales, petits tableaux fixes</td><td>Tableaux dynamiques, objets longs</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box">Règle rapide : pile par défaut. Tas seulement si la taille/durée dépasse le bloc courant, et toujours prévoir la libération.</div>
+    </div>
+
     <!-- Slide 6 -->
     <div class="slide">
       <h2>Exemple pile (auto)</h2>
@@ -402,7 +426,7 @@ ptr-&gt;x = 3.5; // modifie p.x</pre></div>
 
     <div class="controls">
       <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
-      <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">38</span></span>
+      <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">39</span></span>
       <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
     </div>
   </div>

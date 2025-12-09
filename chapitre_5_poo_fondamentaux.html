@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 5 — POO : Fondamentaux</title>
+    <link rel="stylesheet" href="assets/css/cpp_intro.css">
+    <meta name="description" content="Introduction complète aux classes C++ : encapsulation, constructeurs, destructeurs, accesseurs, opérateurs et bonnes pratiques." />
+</head>
+<body>
+    <div class="presentation-container">
+        <a class="back-link" href="index.html">← Retour au menu</a>
+
+        <div class="slide active title-slide">
+            <h1>Chapitre 5 — POO : Fondamentaux</h1>
+            <p class="subtitle">Définir des classes propres et sûres</p>
+        </div>
+
+        <div class="slide">
+            <h2>Qu'est-ce qu'un objet ?</h2>
+            <h3>Dans le monde réel</h3>
+            <ul>
+                <li>Un <strong>objet</strong> est une entité (matérielle ou immatérielle) qui possède des <strong>caractéristiques</strong> (attributs) et peut effectuer des <strong>actions</strong> (méthodes)</li>
+                <li>Exemples : une voiture, une table, un téléphone, mais aussi une idée, un service...</li>
+            </ul>
+            <div class="code-example"><pre>// Exemple : une voiture dans le monde réel
+Caractéristiques : couleur, marque, vitesse maximale
+Actions : démarrer(), accélérer(), freiner()</pre></div>
+            <h3>Parallèle en programmation</h3>
+            <ul>
+                <li><strong>Classe</strong> : un plan ou modèle qui définit les attributs et méthodes</li>
+                <li><strong>Objet</strong> : une instance concrète de la classe, avec des valeurs spécifiques</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Objectifs</h2>
+            <ul>
+                <li>Voir les limites d&#39;un <code>struct</code> « nu » et pourquoi passer à une classe</li>
+                <li>Comprendre la différence <code>struct</code>/<code>class</code> et les niveaux d&#39;accès</li>
+                <li>Identifier attributs, méthodes et le rôle du pointeur <code>this</code></li>
+                <li>Savoir ce qu&#39;est un constructeur (y compris ceux générés automatiquement)</li>
+                <li>Poser des bases d&#39;encapsulation avec accesseurs/mutateurs et organisation de fichiers</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Limites d&#39;un <code>struct</code> simple</h2>
+            <ul>
+                <li>Regroupe des données, mais tout est public : n&#39;importe quel code peut modifier librement</li>
+                <li>Pas d&#39;endroit unique pour vérifier les règles métier (ex : salaire positif)</li>
+                <li>Les invariants peuvent être cassés sans que vous le sachiez</li>
+                <li>Bien pour un paquet de données triviales, limité dès qu&#39;il y a des règles</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Pourquoi une classe ?</h2>
+            <ul>
+                <li>Regrouper les données <strong>et</strong> le code qui les protège</li>
+                <li>Imposer des valeurs valides dès la création (constructeur)</li>
+                <li>Masquer les détails internes, exposer une petite interface claire</li>
+                <li>Préparer la maintenance : moins d&#39;effets de bord, invariants préservés</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2><code>struct</code> vs <code>class</code> en C++</h2>
+            <ul>
+                <li><strong>Différence principale :</strong> accès par défaut<br>→ <code>struct</code> : public, <code>class</code> : private</li>
+                <li>Sinon, mêmes capacités : méthodes, constructeurs, héritage, opérateurs...</li>
+                <li>Convention : <code>struct</code> pour « sacs de données » simples; <code>class</code> pour objets métier encapsulés</li>
+                <li>Vous pouvez tout faire avec l&#39;un ou l&#39;autre, mais choisissez en fonction du niveau de protection voulu</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Attributs et méthodes</h2>
+            <ul>
+                <li><strong>Attribut</strong> : donnée membre (état) ex : <code>int id_;</code>, <code>std::string nom_;</code></li>
+                <li><strong>Méthode</strong> : fonction membre (comportement) ex : <code>void afficher() const;</code></li>
+                <li>Les méthodes peuvent lire/modifier les attributs et faire respecter les règles</li>
+                <li>Ensemble, elles forment l&#39;interface publique de la classe</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Squelette de classe</h2>
+            <div class="code-example"><pre>class Employe {
+private:
+    int id_;
+    std::string nom_;
+public:
+    Employe();
+    Employe(int id, std::string nom);
+    int id() const;
+    void setNom(std::string nom);
+};
+</pre></div>
+            <ul>
+                <li>Préfixer les attributs privés (<code>id_</code>) aide à la lisibilité</li>
+                <li>Mettre les déclarations publiques en haut facilite la lecture</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Encapsulation &amp; niveaux d&#39;accès</h2>
+            <ul>
+                <li><code>private</code> : visible uniquement depuis l&#39;intérieur de la classe (par défaut dans <code>class</code>)</li>
+                <li><code>protected</code> : comme <code>private</code> + accessible par les classes dérivées</li>
+                <li><code>public</code> : accessible partout (par défaut dans <code>struct</code>)</li>
+                <li>L&#39;encapsulation protège les invariants (ex : ID non négatif) et limite les erreurs d&#39;utilisation</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Qu&#39;est-ce qu&#39;un constructeur ?</h2>
+            <ul>
+                <li>Fonction spéciale qui s&#39;exécute <strong>à la création</strong> d&#39;un objet</li>
+                <li>Nom identique à la classe, pas de type de retour</li>
+                <li>Rôle : placer l&#39;objet dans un état valide dès le début</li>
+                <li>Peut prendre des paramètres ou déléguer à un autre constructeur</li>
+            </ul>
+            <div class="code-example"><pre>class Compte {
+public:
+    Compte(std::string nom, double soldeInit)
+        : nom_(std::move(nom)), solde_(soldeInit) {}
+private:
+    std::string nom_;
+    double solde_;
+};</pre></div>
+        </div>
+
+        <div class="slide">
+            <h2>Et si je n&#39;écris aucun constructeur ?</h2>
+            <ul>
+                <li>C++ génère un <strong>constructeur par défaut</strong> qui initialise chaque membre par son propre constructeur par défaut</li>
+                <li>Il génère aussi un <strong>constructeur de copie</strong> et un <strong>opérateur d&#39;affectation par copie</strong> qui copient membre à membre</li>
+                <li>Dès que vous écrivez un constructeur personnalisé, les règles changent : certains constructeurs automatiques peuvent ne plus être générés</li>
+                <li>Conseil : déclarez explicitement ce que vous voulez (<code>= default</code> ou <code>= delete</code>) pour lever l&#39;ambiguïté</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Accesseurs &amp; mutateurs</h2>
+            <div class="code-example"><pre>int id() const { return id_; }
+const std::string&amp; nom() const { return nom_; }
+void setNom(const std::string&amp; nom) {
+    if (nom.empty()) throw std::invalid_argument("nom");
+    nom_ = nom;
+}
+</pre></div>
+            <ul>
+                <li>Accesseurs <code>const</code> retournent par valeur ou référence const</li>
+                <li>Mutateurs valident l&#39;entrée avant affectation</li>
+                <li>Préférer <code>const std::string&amp;</code> pour éviter les copies</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Constructeurs essentiels</h2>
+            <ul>
+                <li>Trois indispensables : par défaut, paramétré, de copie (déplacement au chap. 6)</li>
+                <li>Le constructeur par défaut sert pour créer un objet « vide » ou test</li>
+                <li>Donnez un constructeur <em>principal</em> et faites déléguer les autres pour éviter la répétition</li>
+                <li>Les membres sont initialisés dans l&#39;ordre d&#39;écriture dans la classe, pas dans la liste</li>
+            </ul>
+            <div class="code-example"><pre>Employe::Employe(int id, std::string nom)
+    : id_(id), nom_(std::move(nom)) {}
+
+Employe::Employe() : Employe(0, "") {}
+</pre></div>
+        </div>
+
+        <div class="slide">
+            <h2>Listes d&#39;initialisation</h2>
+            <ul>
+                <li>S&#39;exécutent avant le corps du constructeur</li>
+                <li>Obligatoires pour les références, const, classes sans constructeur par défaut</li>
+                <li>Préférer initialisation dans la liste pour éviter une double affectation</li>
+            </ul>
+            <div class="code-example"><pre>Employe::Employe(int id, std::string nom)
+    : id_(id), nom_(std::move(nom)), salaire_{0.0} {}
+</pre></div>
+        </div>
+
+        <div class="slide">
+            <h2>Constructeur de copie implicite</h2>
+            <ul>
+                <li>Généré automatiquement si vous n&#39;en écrivez pas et si la classe reste copiable</li>
+                <li>Copie chaque membre, donc « superficiel » si vous avez des pointeurs bruts</li>
+                <li>Parfait quand vos membres gèrent déjà leurs ressources (ex : <code>std::string</code>, <code>std::vector</code>)</li>
+                <li>Vous pouvez l&#39;accepter (<code>= default</code>) ou l&#39;interdire (<code>= delete</code>) explicitement</li>
+            </ul>
+            <div class="code-example"><pre>Employe(const Employe&amp;) = default;
+Employe&amp; operator=(const Employe&amp;) = default;
+</pre></div>
+        </div>
+
+        <div class="slide">
+            <h2>Destructeur</h2>
+            <ul>
+                <li>Utilisé pour libérer les ressources acquises dans la classe</li>
+                <li>Généré automatiquement si vous n&#39;en écrivez pas</li>
+                <li>Si aucun <code>new</code>/<code>open</code> → destructeur vide suffisant (<code>= default</code>)</li>
+                <li>Doit être <code>virtual</code> quand on anticipe l&#39;héritage (chap. 7)</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Méthodes <code>const</code></h2>
+            <div class="code-example"><pre>double salaire() const { return salaire_; }
+void augmenter(double montant);
+</pre></div>
+            <ul>
+                <li>Une méthode <code>const</code> ne peut modifier les attributs (sauf <code>mutable</code>)</li>
+                <li>Permet d&#39;appeler la méthode sur des instances const</li>
+                <li>Respecter la promesse const → clé pour la lisibilité</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Membres <code>static</code></h2>
+            <div class="code-example"><pre>class Employe {
+    static int compteur_;
+public:
+    Employe() { ++compteur_; }
+    static int compteur() { return compteur_; }
+};
+int Employe::compteur_ = 0;
+</pre></div>
+            <ul>
+                <li>Partagés entre toutes les instances</li>
+                <li>Initialisés hors de la classe (sauf constexpr inline)</li>
+                <li>Utiles pour compter, caches, configuration globale</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Pointeur <code>this</code></h2>
+            <div class="code-example"><pre>Employe&amp; renommer(std::string nom) {
+    this-&gt;nom_ = nom;
+    return *this;                // permet l&#39;enchaînement
+}</pre></div>
+            <ul>
+                <li>Disponible dans chaque méthode non <code>static</code>; type : <code>Employe* const</code></li>
+                <li>Utile pour enchaîner les appels (<code>return *this;</code>) ou passer l&#39;objet courant</li>
+                <li>Pas accessible dans une méthode <code>static</code> (qui n&#39;a pas d&#39;instance)</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Surcharge d&#39;opérateurs</h2>
+            <div class="code-example"><pre>std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Employe&amp; e) {
+    return os &lt;&lt; e.id() &lt;&lt; " - " &lt;&lt; e.nom();
+}
+
+bool operator==(const Employe&amp; lhs, const Employe&amp; rhs) {
+    return lhs.id() == rhs.id();
+}
+</pre></div>
+            <ul>
+                <li>Éviter les surcharges exotiques; rester cohérent</li>
+                <li>Les opérateurs binaires non membres prennent deux arguments</li>
+                <li>Implémentez-les via l&#39;interface publique (accesseurs) pour éviter d&#39;exposer les internes</li>
+            </ul>
+        </div>
+
+
+        <div class="slide">
+            <h2>Organisation fichiers</h2>
+            <ul>
+                <li><code>.hpp</code> : déclarations (classe, signatures, inline courts)</li>
+                <li><code>.cpp</code> : définitions (constructeurs, méthodes non inline)</li>
+                <li>Inclure l&#39;entête dans le .cpp correspondant</li>
+                <li>Protéger l&#39;entête (<code>#pragma once</code> ou include guard)</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Gestion des dépendances</h2>
+            <ul>
+                <li>Préférer les déclarations avancées pour éviter les inclusions circulaires</li>
+                <li>Inclure uniquement ce dont on a besoin (<code>&lt;iostream&gt;</code> dans le .cpp)</li>
+                <li>Utiliser des pointeurs/références dans les entêtes lorsque possible</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Exceptions &amp; invariants</h2>
+            <ul>
+                <li>Lancer une exception si un invariant est violé (ex: salaire négatif)</li>
+                <li>Utiliser <code>std::invalid_argument</code>, <code>std::logic_error</code>, etc.</li>
+                <li>Documenter ce que chaque méthode garantit (postconditions)</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Bonnes pratiques</h2>
+            <ul>
+                <li>Noms de classe en PascalCase, attributs suffixés (<code>_</code>)</li>
+                <li>Limiter le nombre d&#39;attributs publics</li>
+                <li>Préférer la composition à l&#39;héritage (sauf nécessité)</li>
+                <li>Écrire des tests unitaires pour chaque méthode critique</li>
+            </ul>
+        </div>
+
+
+        <div class="slide">
+            <h2>Résumé</h2>
+            <ul>
+                <li>Encapsulation protège les données et limite les couplages</li>
+                <li>Les constructeurs/destructeurs forment le socle du cycle de vie</li>
+                <li>Les méthodes <code>const</code> et <code>static</code> clarifient l&#39;API</li>
+                <li>Les surcharges utiles (<code>&lt;&lt;</code>, <code>==</code>) restent optionnelles selon le temps disponible</li>
+            </ul>
+        </div>
+
+        <!-- Exemples pratiques -->
+
+        <div class="slide">
+            <h2>Exemple 1 — Classe minimale</h2>
+            <div class="code-example"><pre>class Point {
+public:
+    Point() : x_(0), y_(0) {}
+    Point(int x, int y) : x_(x), y_(y) {}
+    int x() const { return x_; }
+    int y() const { return y_; }
+private:
+    int x_;
+    int y_;
+};
+
+int main() {
+    Point p{3, 4};
+    std::cout &lt;&lt; p.x() << "," << p.y();
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 1 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Deux constructeurs (par défaut + paramétré)
+// Accesseurs const pour lire les coordonnées
+// L&#39;affichage montre "3,4"
+</pre></div>
+            <p>Résultat affiché : <strong>3,4</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 2 — Liste d&#39;initialisation</h2>
+            <div class="code-example"><pre>class Fraction {
+public:
+    Fraction(int num = 0, int den = 1)
+        : num_(num), den_(den) {
+        if (den_ == 0) throw std::invalid_argument("den");
+    }
+private:
+    int num_;
+    int den_;
+};
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 2 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Initialisation directe dans la liste
+// Validation de l&#39;invariant (dénominateur != 0)
+// Lancer une exception évite de créer un objet invalide
+</pre></div>
+            <p>Résultat : création réussie pour Fraction(2,3), exception pour (5,0).</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 3 — Méthodes <code>const</code></h2>
+            <div class="code-example"><pre>class Compteur {
+public:
+    int valeur() const { return valeur_; }
+    void incrementer() { ++valeur_; }
+private:
+    int valeur_ = 0;
+};
+
+void afficher(const Compteur&amp; c) {
+    std::cout &lt;&lt; c.valeur();
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 3 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// La méthode valeur() est const → appelable sur c paramètre const
+// incrementer() modifie l&#39;état et n&#39;est pas const
+</pre></div>
+            <p>Résultat : <strong>0</strong> affiché avant incrément, <strong>1</strong> après.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 4 — Membres <code>static</code></h2>
+            <div class="code-example"><pre>class Session {
+public:
+    Session() { ++instances_; }
+    ~Session() { --instances_; }
+    static int instances() { return instances_; }
+private:
+    static int instances_;
+};
+
+int Session::instances_ = 0;
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 4 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Chaque Session modifie le compteur global
+// Session::instances() retourne l&#39;état partagé
+</pre></div>
+            <p>Résultat : afficher <strong>2</strong> si deux objets sont en vie.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 5 — Surcharge <code>&lt;&lt;</code></h2>
+            <div class="code-example"><pre>class Employe {
+public:
+    Employe(int id, std::string nom)
+        : id_(id), nom_(std::move(nom)) {}
+    int id() const { return id_; }
+    const std::string&amp; nom() const { return nom_; }
+private:
+    int id_;
+    std::string nom_;
+};
+
+std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Employe&amp; e) {
+    return os &lt;&lt; e.id() &lt;&lt; ": " &lt;&lt; e.nom();
+}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 5 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// L&#39;opérateur passe par l&#39;interface publique (id(), nom())
+// Permet d&#39;utiliser std::cout << employe
+</pre></div>
+            <p>Résultat : <strong>12: Alice</strong> par exemple.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 6 — Constructeur délégué</h2>
+            <div class="code-example"><pre>class Horloge {
+public:
+    Horloge() : Horloge(0, 0, 0) {}
+    Horloge(int h, int m, int s)
+        : heures_(h), minutes_(m), secondes_(s) {}
+private:
+    int heures_, minutes_, secondes_;
+};
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 6 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Le constructeur par défaut réutilise celui paramétré
+// Évite la duplication de code d&#39;initialisation
+</pre></div>
+            <p>Résultat : <strong>0:0:0</strong> pour l&#39;instance par défaut.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 7 — Validations dans mutateur</h2>
+            <div class="code-example"><pre>class Produit {
+public:
+    void setPrix(double p) {
+        if (p &lt; 0) throw std::invalid_argument("prix");
+        prix_ = p;
+    }
+private:
+    double prix_ = 0.0;
+};
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 7 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Garantit un invariant simple (prix positif)
+// Lancement d&#39;exception si contrainte violée
+</pre></div>
+            <p>Résultat : exception sur <strong>setPrix(-1)</strong>.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 8 — <code>this</code> pour enchaîner</h2>
+            <div class="code-example"><pre>class Builder {
+public:
+    Builder&amp; avecNom(std::string nom) {
+        nom_ = std::move(nom);
+        return *this;
+    }
+private:
+    std::string nom_;
+};
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 8 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// Retourner *this permet l&#39;enchaînement: builder.avecNom("A").avecNom("B");
+</pre></div>
+            <p>Résultat : API fluide (pattern builder minimal).</p>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 9 — Séparation .hpp/.cpp</h2>
+            <div class="code-example"><pre>// employe.hpp
+class Employe { ... };
+
+// employe.cpp
+#include "employe.hpp"
+Employe::Employe(int id) : id_(id) {}
+</pre></div>
+            <button class="explain-btn" onclick="changeSlide(1)">Voir explication →</button>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple 9 — Explication &amp; résultat</h2>
+            <div class="code-example"><pre>// L&#39;entête contient uniquement les signatures
+// Le .cpp inclut l&#39;entête et définit les méthodes
+</pre></div>
+            <p>Résultat : compilation plus rapide, dépendances maîtrisées.</p>
+        </div>
+
+        <div class="controls">
+            <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+            <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">43</span></span>
+            <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+        </div>
+    </div>
+
+    <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

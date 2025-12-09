@@ -213,9 +213,151 @@ auto p = std::make_unique&lt;int&gt;(42);
 }</pre></div>
     </div>
 
+    <!-- Slide 22 -->
+    <div class="slide">
+      <h2>int* vs std::vector : allocation</h2>
+      <div class="code-example"><pre>// Avec new[] : gestion manuelle
+int* tab1 = new int[5];
+for(int i=0; i&lt;5; ++i) tab1[i] = i;
+// ... utilisation ...
+delete[] tab1; // ❌ si oubli = fuite !
+tab1 = nullptr;
+
+// Avec vector : automatique
+#include &lt;vector&gt;
+std::vector&lt;int&gt; tab2(5); // init à 0
+for(int i=0; i&lt;5; ++i) tab2[i] = i;
+// ... utilisation ...
+// ✅ destruction automatique !</pre></div>
+      <div class="info-box">vector gère la mémoire automatiquement, pas de delete nécessaire.</div>
+    </div>
+
+    <!-- Slide 23 -->
+    <div class="slide">
+      <h2>int* vs std::vector : redimensionnement</h2>
+      <div class="code-example"><pre>// Avec new[] : impossible de redimensionner
+int* tab1 = new int[5];
+// Pour agrandir : recréer tout !
+int* temp = new int[10];
+for(int i=0; i&lt;5; ++i) temp[i] = tab1[i];
+delete[] tab1;
+tab1 = temp; // compliqué et risqué
+
+// Avec vector : facile et sûr
+std::vector&lt;int&gt; tab2 = {1,2,3,4,5};
+tab2.push_back(6); // ✅ ajouter un élément
+tab2.resize(10);   // ✅ redimensionner
+// taille connue : tab2.size()</pre></div>
+      <div class="info-box">vector gère automatiquement la capacité et la taille.</div>
+    </div>
+
+    <!-- Slide 24 -->
+    <div class="slide">
+      <h2>new int vs std::unique_ptr</h2>
+      <div class="code-example"><pre>// Avec new : risque de fuite
+int* p1 = new int(42);
+// ... si exception ici ...
+delete p1; // ❌ jamais executé !
+
+// Avec unique_ptr : sûr
+#include &lt;memory&gt;
+auto p2 = std::make_unique&lt;int&gt;(42);
+// ... même si exception ...
+// ✅ destruction automatique !
+
+// Accès identique
+*p1 = 100;  // déréférencement
+*p2 = 100;  // pareil !</pre></div>
+      <div class="info-box">unique_ptr libère automatiquement, même en cas d'exception.</div>
+    </div>
+
+    <!-- Slide 25 -->
+    <div class="slide">
+      <h2>Comparaison tableaux dynamiques</h2>
+      <div class="code-example"><pre>// new[] : manuel, dangereux
+int* t1 = new int[5]{1,2,3,4,5};
+int taille1 = 5; // à suivre manuellement !
+// t1[10] = 0; // ❌ crash, pas de vérification
+delete[] t1;
+
+// vector : sûr, flexible
+std::vector&lt;int&gt; t2 = {1,2,3,4,5};
+int taille2 = t2.size(); // ✅ connu automatiquement
+// t2.at(10) = 0; // ✅ exception si hors bornes
+t2.push_back(6); // ✅ agrandi si besoin
+// destruction auto</pre></div>
+      <div class="info-box">vector connait sa taille et peut vérifier les accès avec <code>.at()</code>.</div>
+    </div>
+
+    <!-- Slide 26 -->
+    <div class="slide">
+      <h2>Exemple complet : pourquoi std::vector</h2>
+      <div class="code-example"><pre>#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int main(){
+  vector&lt;int&gt; nombres; // vide au depart
+
+  // Ajouter des elements facilement
+  for(int i=0; i&lt;10; ++i){
+    nombres.push_back(i * i); // 0,1,4,9,16...
+  }
+
+  // Connaitre la taille
+  cout &lt;&lt; "Taille : " &lt;&lt; nombres.size() &lt;&lt; endl;
+
+  // Parcourir
+  for(int val : nombres){
+    cout &lt;&lt; val &lt;&lt; " ";
+  }
+
+  // Pas de delete, pas de fuite !
+  return 0;
+}</pre></div>
+    </div>
+
+    <!-- Slide 27 -->
+    <div class="slide">
+      <h2>Tableau comparatif</h2>
+      <table style="width:100%; border-collapse:collapse; margin:20px 0;">
+        <tr style="background:#2d2d2d;">
+          <th style="border:1px solid #555; padding:10px;">Critère</th>
+          <th style="border:1px solid #555; padding:10px;">new/delete</th>
+          <th style="border:1px solid #555; padding:10px;">vector/unique_ptr</th>
+        </tr>
+        <tr>
+          <td style="border:1px solid #555; padding:10px;">Gestion mémoire</td>
+          <td style="border:1px solid #555; padding:10px;">❌ Manuelle</td>
+          <td style="border:1px solid #555; padding:10px;">✅ Automatique</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #555; padding:10px;">Risque de fuite</td>
+          <td style="border:1px solid #555; padding:10px;">❌ Élevé</td>
+          <td style="border:1px solid #555; padding:10px;">✅ Nul</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #555; padding:10px;">Taille connue</td>
+          <td style="border:1px solid #555; padding:10px;">❌ À suivre</td>
+          <td style="border:1px solid #555; padding:10px;">✅ .size()</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #555; padding:10px;">Redimensionner</td>
+          <td style="border:1px solid #555; padding:10px;">❌ Complexe</td>
+          <td style="border:1px solid #555; padding:10px;">✅ push_back()</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #555; padding:10px;">Sécurité</td>
+          <td style="border:1px solid #555; padding:10px;">❌ Aucune</td>
+          <td style="border:1px solid #555; padding:10px;">✅ .at() vérifie</td>
+        </tr>
+      </table>
+      <div class="info-box">Préférer vector et unique_ptr sauf contrainte spécifique.</div>
+    </div>
+
     <div class="controls">
       <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
-      <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">21</span></span>
+      <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">27</span></span>
       <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
     </div>
   </div>

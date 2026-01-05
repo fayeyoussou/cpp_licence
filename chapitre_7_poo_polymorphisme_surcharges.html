@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 7 — POO : Polymorphisme & Surcharges</title>
+    <link rel="stylesheet" href="assets/css/cpp_intro.css">
+    <meta name="description" content="POO L2 : surcharge de fonctions et d'opérateurs, override/final, polymorphisme dynamique, classes abstraites, slicing et conteneurs polymorphes." />
+</head>
+<body>
+    <div class="presentation-container">
+        <a class="back-link" href="index.html">← Retour au menu</a>
+
+        <div class="slide active title-slide">
+            <h1>Chapitre 7 — Polymorphisme &amp; Surcharges</h1>
+            <p class="subtitle">Early vs late binding, opérateurs, override, classes abstraites</p>
+        </div>
+
+        <div class="slide">
+            <h2>Objectifs</h2>
+            <ul>
+                <li>Distinguer surcharge (compile-time) et polymorphisme (runtime)</li>
+                <li>Écrire des overrides sûrs avec <code>override</code>/<code>final</code></li>
+                <li>Surcharger des opérateurs usuels de façon cohérente</li>
+                <li>Éviter le slicing et structurer des conteneurs polymorphes</li>
+                <li>Utiliser classes abstraites et méthodes virtuelles pures</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Rappel des 4 piliers</h2>
+            <ul>
+                <li>Encapsulation (chap. 5) : données protégées</li>
+                <li>Héritage (chap. 6) : réutilisation/extension</li>
+                <li>Polymorphisme : plusieurs comportements via une interface commune</li>
+                <li>Abstraction : exposer le contrat, cacher l'implémentation</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Polymorphisme : déf</h2>
+            <ul>
+                <li><strong>Ad hoc</strong> : surcharge de fonctions/opérateurs</li>
+                <li><strong>Paramétrique</strong> : templates (pas détaillé ici)</li>
+                <li><strong>Dynamique</strong> : <code>virtual</code> + dispatch à l'exécution</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Early vs Late binding</h2>
+            <ul>
+                <li><strong>Early</strong> (compile-time) : choix fait par le compilateur (surcharge)</li>
+                <li><strong>Late</strong> (runtime) : choix selon le type dynamique (virtual)</li>
+                <li>Choisir selon le besoin de flexibilité et de coût</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Surcharge de fonctions</h2>
+            <div class="code-example"><pre>int aire(int c);          // carré
+double aire(double r);    // disque
+int aire(int l, int h);   // rectangle
+</pre></div>
+            <ul>
+                <li>Même nom, signatures différentes</li>
+                <li>Résolution à la compilation</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Résolution de surcharge</h2>
+            <ul>
+                <li>Conversion exacte préférée aux conversions implicites</li>
+                <li>Peut échouer si ambigu (ex : <code>aire(1, 2.0)</code>)</li>
+                <li>Éviter de combiner types trop proches sans besoin</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Surcharge et <code>const</code></h2>
+            <div class="code-example"><pre>class Texte {
+public:
+    const std::string& data() const { return data_; } // lecture
+    std::string& data() { return data_; }             // écriture
+private:
+    std::string data_;
+};</pre></div>
+            <p>Deux signatures distinctes selon le contexte const.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Surcharge d'opérateurs : principes</h2>
+            <ul>
+                <li>Garder le sens naturel (pas d'opérateurs surprises)</li>
+                <li>Symétrie/cohérence avec les types standards</li>
+                <li>Les opérateurs binaires non membres prennent deux arguments</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Opérateurs d'égalité</h2>
+            <div class="code-example"><pre>class Point {
+public:
+    Point(int x, int y) : x_(x), y_(y) {}
+    friend bool operator==(const Point& a, const Point& b) {
+        return a.x_ == b.x_ && a.y_ == b.y_;
+    }
+    friend bool operator!=(const Point& a, const Point& b) {
+        return !(a == b);
+    }
+private:
+    int x_, y_;
+};</pre></div>
+            <ul>
+                <li>Définir <code>!=</code> à partir de <code>==</code></li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Opérateurs d'ordre</h2>
+            <div class="code-example"><pre>friend bool operator<(const Point& a, const Point& b) {
+    return std::tie(a.x_, a.y_) < std::tie(b.x_, b.y_);
+}</pre></div>
+            <ul>
+                <li>Utile pour <code>std::set</code>/<code>std::map</code></li>
+                <li>Ordre cohérent avec l'égalité</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Opérateurs arithmétiques</h2>
+            <div class="code-example"><pre>friend Point operator+(const Point& a, const Point& b) {
+    return Point(a.x_ + b.x_, a.y_ + b.y_);
+}</pre></div>
+            <ul>
+                <li>Préférer des fonctions non membres pour la commutativité</li>
+                <li>Retourner un nouvel objet (pas modifier les opérandes)</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Flux <code>&lt;&lt;</code> et <code>&gt;&gt;</code></h2>
+            <div class="code-example"><pre>friend std::ostream& operator<<(std::ostream& os, const Point& p) {
+    return os << p.x_ << \",\" << p.y_;
+}</pre></div>
+            <ul>
+                <li>Permet l'impression naturelle dans <code>std::cout</code></li>
+                <li>Doit retourner le flux passé en paramètre</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Indexation <code>[]</code></h2>
+            <div class="code-example"><pre>class Vecteur {
+public:
+    int& operator[](std::size_t i) { return data_.at(i); }
+    const int& operator[](std::size_t i) const { return data_.at(i); }
+private:
+    std::vector<int> data_;
+};</pre></div>
+            <p>Fournir version const et non-const, valider les bornes (ici via <code>at</code>).</p>
+        </div>
+
+        <div class="slide">
+            <h2>Appel de fonction <code>()</code></h2>
+            <div class="code-example"><pre>class Somme {
+public:
+    int operator()(int a, int b) const { return a + b; }
+};
+
+Somme s;
+int r = s(2, 3); // 5</pre></div>
+            <p>Utile pour objets fonction ou stratégies.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Préfixe vs postfixe</h2>
+            <div class="code-example"><pre>class Compteur {
+public:
+    Compteur& operator++() { ++v_; return *this; }    // préfixe
+    Compteur operator++(int) { Compteur tmp(*this); ++v_; return tmp; } // postfixe
+private:
+    int v_ = 0;
+};</pre></div>
+            <p>Postfixe prend un paramètre <code>int</code> factice pour différencier.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Polymorphisme dynamique</h2>
+            <div class="code-example"><pre>class Animal {
+public:
+    virtual ~Animal() = default;
+    virtual void parler() const = 0;
+};
+
+class Chien : public Animal {
+public:
+    void parler() const override { std::cout << \"woof\"; }
+};
+
+void faireParler(const Animal& a) { a.parler(); }</pre></div>
+            <ul>
+                <li><code>virtual</code> + appel via base = dispatch dynamique</li>
+                <li><code>override</code> sécurise la redéfinition</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Destructeur virtuel</h2>
+            <ul>
+                <li>Indispensable si suppression via pointeur/référence de base</li>
+                <li>Sinon le destructeur dérivé ne serait pas appelé</li>
+            </ul>
+            <div class="code-example"><pre>class Base {
+public:
+    virtual ~Base() = default;
+};</pre></div>
+        </div>
+
+        <div class="slide">
+            <h2>Slicing : à éviter</h2>
+            <ul>
+                <li>Copier un dérivé par valeur dans une base coupe la partie dérivée</li>
+                <li>Ne pas stocker des dérivés par valeur dans un conteneur de base</li>
+            </ul>
+            <div class="code-example"><pre>std::vector<Animal> v; // Mauvais : slice
+// Les parties Chien/Chat sont perdues</pre></div>
+        </div>
+
+        <div class="slide">
+            <h2>Conteneur polymorphe sans slicing</h2>
+            <div class="code-example"><pre>Chien c;
+Chat ch;
+std::vector<std::reference_wrapper<Animal>> animaux{c, ch};
+
+for (const Animal& a : animaux) a.parler();</pre></div>
+            <p>La durée de vie des objets reste gérée ailleurs.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Masquage vs override</h2>
+            <ul>
+                <li>Même nom + signature différente → masque</li>
+                <li>Même signature + <code>virtual</code> → override</li>
+                <li>Utiliser <code>override</code> pour forcer la vérification</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Classes abstraites</h2>
+            <ul>
+                <li>Au moins une méthode virtuelle pure (<code>= 0</code>)</li>
+                <li>Non instanciables directement</li>
+                <li>Définissent un contrat minimal</li>
+            </ul>
+            <div class="code-example"><pre>class Forme {
+public:
+    virtual ~Forme() = default;
+    virtual double aire() const = 0; // pure
+};</pre></div>
+        </div>
+
+        <div class="slide">
+            <h2>Interfaces pures</h2>
+            <ul>
+                <li>Pas de données membres</li>
+                <li>Uniquement des méthodes virtuelles pures</li>
+                <li>Permet de changer d'implémentation sans toucher au code client</li>
+            </ul>
+            <div class="code-example"><pre>class Imprimable {
+public:
+    virtual ~Imprimable() = default;
+    virtual void imprimer(std::ostream&) const = 0;
+};</pre></div>
+        </div>
+
+        <div class="slide">
+            <h2>Implémentation partielle</h2>
+            <div class="code-example"><pre>class Forme {
+public:
+    virtual ~Forme() = default;
+    virtual double aire() const = 0;
+    void afficher() const { std::cout << aire(); } // commun
+};</pre></div>
+            <p>On factorise du code tout en restant abstrait.</p>
+        </div>
+
+        <div class="slide">
+            <h2>Override et final</h2>
+            <ul>
+                <li><code>override</code> impose la même signature que la base</li>
+                <li><code>final</code> interdit une redéfinition ultérieure</li>
+                <li>Combinez pour sécuriser vos hiérarchies</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Binding : rappel</h2>
+            <ul>
+                <li>Early binding : surcharge, opérateurs, fonctions libres</li>
+                <li>Late binding : <code>virtual</code> (table de dispatch)</li>
+                <li>Comprendre quel mécanisme s'applique pour prédire l'appel</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Exemple complet</h2>
+            <div class="code-example"><pre>class Forme {
+public:
+    virtual ~Forme() = default;
+    virtual double aire() const = 0;
+    virtual void afficher(std::ostream& os) const = 0;
+};
+
+class Rectangle : public Forme {
+public:
+    Rectangle(double l, double h) : l_(l), h_(h) {}
+    double aire() const override { return l_ * h_; }
+    void afficher(std::ostream& os) const override { os << \"Rect(\" << l_ << \"x\" << h_ << \")\"; }
+private:
+    double l_, h_;
+};</pre></div>
+        </div>
+
+        <div class="slide">
+            <h2>Travail à réaliser</h2>
+            <ul>
+                <li>Créer une hiérarchie <code>Forme</code> avec <code>aire()</code> virtuel pur</li>
+                <li>Implémenter <code>Cercle</code> et <code>Rectangle</code>, les placer dans un conteneur sans slicing</li>
+                <li>Surcharger <code>==</code>, <code>&lt;&lt;</code> pour vos formes</li>
+                <li>Écrire un <code>operator()</code> qui calcule la surface totale d'un vecteur de formes</li>
+            </ul>
+        </div>
+
+        <div class="controls">
+            <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
+            <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">30</span></span>
+            <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
+        </div>
+    </div>
+
+    <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

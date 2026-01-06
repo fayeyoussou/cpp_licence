@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cours complementaire - Surcharge d'operateurs</title>
+  <link rel="stylesheet" href="assets/css/cpp_intro.css">
+  <meta name="description" content="Memo complet de surcharge d'operateurs C++: streams, arithmetique, comparaisons, operateurs membres, bonnes pratiques.">
+</head>
+<body>
+  <div class="presentation-container">
+    <a class="back-link" href="index.html"><- Retour au menu</a>
+
+    <!-- Slide 1: Titre -->
+    <div class="slide active title-slide">
+      <h1>Surcharge d'operateurs</h1>
+      <p class="subtitle">Cours complementaire - memo complet + explications</p>
+    </div>
+
+    <!-- Slide 2: Objectifs -->
+    <div class="slide">
+      <h2>Objectifs</h2>
+      <ul>
+        <li>Connaitre les signatures classiques: flux, arithmetique, comparaisons</li>
+        <li>Comprendre la difference entre operateurs membres et friend</li>
+        <li>Eviter les surcharges surprenantes ou ambigues</li>
+        <li>Appliquer de bonnes pratiques (const, retour, symetrie)</li>
+      </ul>
+    </div>
+
+    <!-- Slide 3: Regles de base -->
+    <div class="slide">
+      <h2>Regles de base</h2>
+      <ul>
+        <li>Au moins un operande doit etre un type utilisateur</li>
+        <li>On ne peut pas inventer de nouveaux operateurs</li>
+        <li>La priorite/associativite ne change pas</li>
+        <li>Interdits: <code>.</code>, <code>::</code>, <code>?:</code>, <code>sizeof</code>, <code>typeid</code></li>
+        <li>Garder un sens naturel pour ne pas surprendre</li>
+      </ul>
+      <div class="info-box">Si l'operateur ne reste pas intuitif, mieux vaut une methode nommee.</div>
+    </div>
+
+    <!-- Slide 4: Membre vs friend -->
+    <div class="slide">
+      <h2>Membre vs friend</h2>
+      <ul>
+        <li>Doivent etre membres: <code>=</code>, <code>()</code>, <code>[]</code>, <code>-&gt;</code>, <code>-&gt;*</code></li>
+        <li>Souvent non-membres: <code>+</code>, <code>-</code>, <code>==</code>, <code>&lt;&lt;</code>, <code>&gt;&gt;</code></li>
+        <li>Utiliser <code>friend</code> si l'acces aux donnees privees est necessaire</li>
+        <li>Operateurs symetriques: preferer non-membre pour garder <code>a + b</code> et <code>b + a</code></li>
+      </ul>
+    </div>
+
+    <!-- Slide 5: Noms utilises dans le memo -->
+    <div class="slide">
+      <h2>Noms utilises dans le memo</h2>
+      <div class="code-example"><pre>class Objett {};
+class Objet {};
+class Classe {};
+class Etudiant {};
+
+Objett a, b;
+</pre></div>
+      <div class="info-box">Les noms <code>Objett</code>/<code>Objet</code>/<code>Classe</code>/<code>Etudiant</code> sont des exemples.</div>
+    </div>
+
+    <!-- Slide 6: Flux de sortie -->
+    <div class="slide">
+      <h2>Flux &lt;&lt; (sortie)</h2>
+      <div class="code-example"><pre>friend std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Objett&amp; e);
+
+// usage:
+std::cout &lt;&lt; a &lt;&lt; "\n";
+</pre></div>
+      <ul>
+        <li>Retourner le flux pour permettre l'enchainement</li>
+        <li>Parametre en <code>const</code> si l'objet n'est pas modifie</li>
+      </ul>
+    </div>
+
+    <!-- Slide 7: Flux d'entree -->
+    <div class="slide">
+      <h2>Flux &gt;&gt; (entree)</h2>
+      <div class="code-example"><pre>friend std::istream&amp; operator&gt;&gt;(std::istream&amp; is, Objett&amp; e);
+
+// usage:
+std::cin &gt;&gt; a;
+</pre></div>
+      <ul>
+        <li>Parametre non-const car l'objet est modifie</li>
+        <li>Verifier l'etat du flux pour valider la saisie</li>
+      </ul>
+    </div>
+
+    <!-- Slide 8: Arithmetique (binaire) -->
+    <div class="slide">
+      <h2>Arithmetic (binary)</h2>
+      <div class="code-example"><pre>friend Objett operator+(const Objett&amp; a, const Objett&amp; b);
+// usage:
+Objett c = a + b;
+
+friend Objett operator-(const Objett&amp; a, const Objett&amp; b);
+// usage:
+Objett c = a - b;
+
+friend Objett operator*(const Objett&amp; a, const Objett&amp; b);
+// usage:
+Objett c = a * b;
+
+friend Objett operator/(const Objett&amp; a, const Objett&amp; b);
+// usage:
+Objett c = a / b;
+
+friend Objett operator%(const Objett&amp; a, const Objett&amp; b);
+// usage:
+Objett c = a % b;
+</pre></div>
+      <div class="info-box">Retourner un nouvel objet; ne pas modifier les operandes.</div>
+    </div>
+
+    <!-- Slide 9: Exemple avec une autre classe -->
+    <div class="slide">
+      <h2>Exemple avec une autre classe</h2>
+      <div class="code-example"><pre>friend Classe operator+(const Classe&amp; a, const Classe&amp; b);
+friend Classe operator-(const Classe&amp; a, const Classe&amp; b);
+</pre></div>
+      <div class="info-box">Les signatures ne changent pas: seul le type varie.</div>
+    </div>
+
+    <!-- Slide 10: Arithmetique avec scalaire -->
+    <div class="slide">
+      <h2>Arithmetic with scalar</h2>
+      <div class="code-example"><pre>friend Objett operator*(const Objett&amp; a, int k);
+// usage:
+Objett c = a * 3;
+
+friend Objett operator*(int k, const Objett&amp; a);
+// usage:
+Objett c = 3 * a;
+</pre></div>
+      <div class="info-box">Deux versions pour garder la commutativite.</div>
+    </div>
+
+    <!-- Slide 11: Operateurs unaires -->
+    <div class="slide">
+      <h2>Unary operators</h2>
+      <div class="code-example"><pre>friend Objett operator-(const Objett&amp; a);
+// usage:
+Objett c = -a;
+
+friend Objett operator+(const Objett&amp; a);
+// usage:
+Objett c = +a;   // usually returns the same object
+</pre></div>
+    </div>
+
+    <!-- Slide 12: Comparaisons -->
+    <div class="slide">
+      <h2>Comparaisons</h2>
+      <div class="code-example"><pre>friend bool operator==(const Objett&amp; a, const Objett&amp; b);
+// usage:
+if (a == b) { }
+
+friend bool operator!=(const Objett&amp; a, const Objett&amp; b);
+// usage:
+if (a != b) { }
+
+friend bool operator&lt;(const Objett&amp; a, const Objett&amp; b);
+// usage:
+if (a &lt; b) { }
+
+friend bool operator&lt;=(const Objett&amp; a, const Objett&amp; b);
+// usage:
+if (a &lt;= b) { }
+
+friend bool operator&gt;(const Objett&amp; a, const Objett&amp; b);
+// usage:
+if (a &gt; b) { }
+
+friend bool operator&gt;=(const Objett&amp; a, const Objett&amp; b);
+// usage:
+if (a &gt;= b) { }
+
+bool operator&lt;(const Objet&amp; other);
+</pre></div>
+      <div class="info-box">Implementer <code>!=</code> a partir de <code>==</code> et reutiliser <code>&lt;</code> pour le reste.</div>
+    </div>
+
+    <!-- Slide 13: Bitwise -->
+    <div class="slide">
+      <h2>Bitwise operators</h2>
+      <div class="code-example"><pre>friend Objett operator&amp;(const Objett&amp; a, const Objett&amp; b);
+// usage:
+Objett c = a &amp; b;
+
+friend Objett operator|(const Objett&amp; a, const Objett&amp; b);
+// usage:
+Objett c = a | b;
+
+friend Objett operator^(const Objett&amp; a, const Objett&amp; b);
+// usage:
+Objett c = a ^ b;
+
+friend Objett operator~(const Objett&amp; a);
+// usage:
+Objett c = ~a;
+</pre></div>
+      <div class="info-box">A utiliser seulement si l'objet represente des flags/bits.</div>
+    </div>
+
+    <!-- Slide 14: Bit shifts -->
+    <div class="slide">
+      <h2>Bit shifts</h2>
+      <div class="code-example"><pre>friend Objett operator&lt;&lt;(const Objett&amp; a, int shift);
+// usage:
+Objett c = a &lt;&lt; 2;
+
+friend Objett operator&gt;&gt;(const Objett&amp; a, int shift);
+// usage:
+Objett c = a &gt;&gt; 2;
+</pre></div>
+      <div class="info-box">Ne pas confondre avec le flux <code>std::ostream</code>.</div>
+    </div>
+
+    <!-- Slide 15: Logiques -->
+    <div class="slide">
+      <h2>Logical operators</h2>
+      <div class="code-example"><pre>friend bool operator!(const Objett&amp; a);
+// usage:
+if (!a) { }
+
+friend bool operator&amp;&amp;(const Objett&amp; a, const Objett&amp; b);
+// usage:
+if (a &amp;&amp; b) { }
+
+friend bool operator||(const Objett&amp; a, const Objett&amp; b);
+// usage:
+if (a || b) { }
+</pre></div>
+      <div class="info-box">Pas de court-circuit comme les types natifs.</div>
+    </div>
+
+    <!-- Slide 16: Affectations composees -->
+    <div class="slide">
+      <h2>Compound assignment</h2>
+      <div class="code-example"><pre>friend Objett&amp; operator+=(Objett&amp; a, const Objett&amp; b);
+// usage:
+a += b;
+
+friend Objett&amp; operator-=(Objett&amp; a, const Objett&amp; b);
+// usage:
+a -= b;
+
+friend Objett&amp; operator*=(Objett&amp; a, const Objett&amp; b);
+// usage:
+a *= b;
+
+friend Objett&amp; operator/=(Objett&amp; a, const Objett&amp; b);
+// usage:
+a /= b;
+</pre></div>
+      <div class="info-box">Souvent implementes comme membres pour modifier <code>*this</code>.</div>
+    </div>
+
+    <!-- Slide 17: operator[] -->
+    <div class="slide">
+      <h2>operator[] (subscript)</h2>
+      <div class="code-example"><pre>Etudiant* operator[](int id);
+const Etudiant* operator[](int id) const;
+
+T&amp; operator[](std::size_t i);
+const T&amp; operator[](std::size_t i) const;
+</pre></div>
+      <div class="code-example"><pre>// usage:
+a[0] = ...;
+std::cout &lt;&lt; a[1];
+</pre></div>
+      <div class="info-box">Prevoir une version <code>const</code> et verifier les bornes si besoin.</div>
+    </div>
+
+    <!-- Slide 18: operator() -->
+    <div class="slide">
+      <h2>operator() (call)</h2>
+      <div class="code-example"><pre>Ret operator()(args...) const;
+// usage:
+auto r = a(10, 20);
+</pre></div>
+    </div>
+
+    <!-- Slide 19: operator= -->
+    <div class="slide">
+      <h2>Assignment operator=</h2>
+      <div class="code-example"><pre>Objett&amp; operator=(const Objett&amp; other);
+// usage:
+a = b;
+</pre></div>
+      <div class="info-box">Gerer l'auto-affectation et les ressources si necessaire.</div>
+    </div>
+
+    <!-- Slide 20: Increment / decrement -->
+    <div class="slide">
+      <h2>Increment / decrement</h2>
+      <div class="code-example"><pre>Objett&amp; operator++();    // ++a
+Objett operator++(int);  // a++
+Objett&amp; operator--();    // --a
+Objett operator--(int);  // a--
+// usage:
+++a;
+a++;
+--a;
+a--;
+</pre></div>
+    </div>
+
+    <!-- Slide 21: operator-> -->
+    <div class="slide">
+      <h2>operator-&gt; (smart-pointer style)</h2>
+      <div class="code-example"><pre>T* operator-&gt;();
+const T* operator-&gt;() const;
+// usage:
+a-&gt;method();
+</pre></div>
+      <div class="info-box">Utile pour les wrappers et pointeurs intelligents.</div>
+    </div>
+
+    <!-- Slide 22: Conversion operator -->
+    <div class="slide">
+      <h2>Conversion operators</h2>
+      <div class="code-example"><pre>explicit operator bool() const;
+// usage:
+if (a) { }
+bool ok = static_cast&lt;bool&gt;(a);
+</pre></div>
+      <div class="info-box"><code>explicit</code> evite les conversions implicites dangereuses.</div>
+    </div>
+
+    <!-- Slide 23: Accesseurs -->
+    <div class="slide">
+      <h2>Accesseurs et const-correctness</h2>
+      <div class="code-example"><pre>const std::string&amp; getMatricule();
+</pre></div>
+      <ul>
+        <li>Retourner une reference const pour eviter une copie</li>
+        <li>Conseille: marquer la methode <code>const</code> si elle ne modifie pas l'objet</li>
+      </ul>
+      <div class="code-example"><pre>const std::string&amp; getMatricule() const;
+</pre></div>
+    </div>
+
+    <!-- Slide 24: Checklist -->
+    <div class="slide">
+      <h2>Checklist rapide</h2>
+      <ul>
+        <li>Signature claire, semantique naturelle</li>
+        <li>Version <code>const</code> quand c'est pertinent</li>
+        <li>Operateurs symetriques en non-membre</li>
+        <li>Eviter les surcharges inutiles ou dangereuses</li>
+      </ul>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button id="prevBtn" onclick="changeSlide(-1)">&larr; Precedent</button>
+      <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">24</span></span>
+      <button id="nextBtn" onclick="changeSlide(1)">Suivant &rarr;</button>
+    </div>
+  </div>
+
+  <script src="assets/js/cpp_intro.js"></script>
+</body>
+</html>

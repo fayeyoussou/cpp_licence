@@ -17,6 +17,118 @@
         </div>
 
         <div class="slide">
+            <h2>Contexte réel : paiements (sans POO)</h2>
+            <div class="code-example"><pre>void payerParCarte(double montant) {
+    std::cout << "Paiement par carte de " << montant << std::endl;
+}
+void payerParCash(double montant) {
+    std::cout << "Paiement en espèces de " << montant << std::endl;
+}
+void payerParMobile(double montant) {
+    std::cout << "Paiement mobile de " << montant << std::endl;
+}</pre></div>
+            <ul>
+                <li>Ça fonctionne, mais le code est éparpillé</li>
+                <li>Difficile à organiser et à faire évoluer</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>POO sans polymorphisme : classes séparées</h2>
+            <div class="code-example"><pre>class PaiementCarte {
+public:
+    void payer(double montant) {
+        std::cout << "Paiement par carte de " << montant << std::endl;
+    }
+};
+
+class PaiementCash {
+public:
+    void payer(double montant) {
+        std::cout << "Paiement en espèces de " << montant << std::endl;
+    }
+};
+
+class PaiementMobile {
+public:
+    void payer(double montant) {
+        std::cout << "Paiement mobile de " << montant << std::endl;
+    }
+};</pre></div>
+            <ul>
+                <li>Chaque classe est claire et autonome</li>
+                <li>Mais impossible de traiter "un paiement" générique</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Traitement générique… sans polymorphisme</h2>
+            <div class="code-example"><pre>void traiterPaiement(int type, double montant) {
+    if (type == 1) {
+        PaiementCarte p;
+        p.payer(montant);
+    } else if (type == 2) {
+        PaiementCash p;
+        p.payer(montant);
+    } else if (type == 3) {
+        PaiementMobile p;
+        p.payer(montant);
+    }
+}</pre></div>
+            <ul>
+                <li>if/else en cascade</li>
+                <li>Chaque nouveau type casse la fonction</li>
+                <li>Code fermé à l’extension</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>Héritage sans <code>virtual</code> : surprise</h2>
+            <div class="code-example"><pre>class Paiement {
+public:
+    void payer(double montant) {
+        std::cout << "Paiement générique de " << montant << std::endl;
+    }
+};
+
+class PaiementCarte : public Paiement {
+public:
+    void payer(double montant) {
+        std::cout << "Paiement par carte de " << montant << std::endl;
+    }
+};
+
+Paiement* p = new PaiementCarte();
+p->payer(5000); // affiche "Paiement générique..."</pre></div>
+            <ul>
+                <li>Le compilateur ne voit que <code>Paiement*</code></li>
+                <li>Appel résolu à la compilation (liaison statique)</li>
+                <li>L’héritage seul ne suffit pas</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h2>La vraie problématique révélée → polymorphisme</h2>
+            <ul>
+                <li>Utiliser un seul type (<code>Paiement*</code>)</li>
+                <li>Stocker différents objets et appeler <code>payer()</code></li>
+                <li>Obtenir le bon comportement selon l’objet réel</li>
+                <li>Décision à l’exécution : c’est le polymorphisme</li>
+            </ul>
+            <div class="code-example"><pre>class Paiement {
+public:
+    virtual void payer(double montant) {
+        std::cout << "Paiement générique de " << montant << std::endl;
+    }
+    virtual ~Paiement() = default;
+};
+
+Paiement* p = new PaiementCarte();
+p->payer(5000); // Paiement par carte...</pre></div>
+            <p>Le mot-clé <code>virtual</code> active la liaison dynamique.</p>
+        </div>
+
+        <div class="slide">
             <h2>Objectifs</h2>
             <ul>
                 <li>Distinguer surcharge (compile-time) et polymorphisme (runtime)</li>
@@ -334,7 +446,7 @@ private:
 
         <div class="controls">
             <button id="prevBtn" onclick="changeSlide(-1)">← Précédent</button>
-            <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">30</span></span>
+            <span class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">33</span></span>
             <button id="nextBtn" onclick="changeSlide(1)">Suivant →</button>
         </div>
     </div>

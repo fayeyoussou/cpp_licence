@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen - Atelier de Couture</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            line-height: 1.7;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(30, 30, 50, 0.9);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        .back-link {
+            display: inline-block;
+            color: #64b5f6;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        h1 { color: #fff; text-align: center; margin-bottom: 10px; font-size: 2.2rem; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 40px; font-size: 1.1rem; }
+        h2 { color: #64b5f6; margin: 35px 0 15px 0; padding-bottom: 8px; border-bottom: 2px solid #64b5f6; font-size: 1.4rem; }
+        h3 { color: #81c784; margin: 20px 0 10px 0; font-size: 1.1rem; }
+        ul { margin-left: 25px; margin-bottom: 15px; }
+        li { margin-bottom: 6px; }
+        strong { color: #fff; }
+        hr { border: none; border-top: 1px solid #444; margin: 30px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+        th { background: rgba(100, 181, 246, 0.2); color: #64b5f6; }
+        .warning { background: rgba(255, 183, 77, 0.15); border-left: 4px solid #ffb74d; padding: 10px 15px; margin: 15px 0; }
+        .info { background: rgba(129, 199, 132, 0.15); border-left: 4px solid #81c784; padding: 10px 15px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a class="back-link" href="index.html">&larr; Retour au menu</a>
+
+        <h1>Examen : Atelier de Couture</h1>
+        <p class="subtitle">Description des classes et fonctionnalites - POO C++</p>
+
+        <!-- Vue d'ensemble -->
+        <h2>Vue d'ensemble</h2>
+        <ul>
+            <li><strong>Personne</strong> : classe abstraite de base</li>
+            <li><strong>Client</strong> : derive de Personne</li>
+            <li><strong>Couturier</strong> : derive de Personne (classe de base pour les types de couturiers)</li>
+            <li><strong>CouturierSenior</strong> : derive de Couturier</li>
+            <li><strong>Apprenti</strong> : derive de Couturier</li>
+            <li><strong>Tissu</strong> : materiau pour les habits</li>
+            <li><strong>Commande</strong> : lie un client a un tissu</li>
+            <li><strong>HabilleTermine</strong> : habit realise (classe final)</li>
+            <li><strong>Atelier</strong> : classe principale qui gere tout</li>
+        </ul>
+
+        <hr>
+
+        <!-- Hierarchie d'heritage -->
+        <h2>Hierarchie d'heritage</h2>
+        <pre style="background: #0d1117; padding: 15px; border-radius: 8px; margin: 15px 0;">
+Personne (abstraite)
+    |
+    +-- Client
+    |
+    +-- Couturier
+            |
+            +-- CouturierSenior
+            |
+            +-- Apprenti
+        </pre>
+
+        <hr>
+
+        <!-- Relations -->
+        <h2>Relations</h2>
+
+        <h3>Heritage (est-un)</h3>
+        <ul>
+            <li>Client <strong>est-une</strong> Personne</li>
+            <li>Couturier <strong>est-une</strong> Personne</li>
+            <li>CouturierSenior <strong>est-un</strong> Couturier</li>
+            <li>Apprenti <strong>est-un</strong> Couturier</li>
+        </ul>
+
+        <h3>Composition (a-un)</h3>
+        <ul>
+            <li>Atelier <strong>a-une</strong> liste de Client</li>
+            <li>Atelier <strong>a-une</strong> liste de Couturier (peut contenir CouturierSenior et Apprenti)</li>
+            <li>Atelier <strong>a-une</strong> liste de Tissu</li>
+            <li>Atelier <strong>a-une</strong> liste de Commande</li>
+            <li>Atelier <strong>a-une</strong> liste de HabilleTermine</li>
+            <li>Commande <strong>a-un</strong> Client</li>
+            <li>Commande <strong>a-un</strong> Tissu</li>
+            <li>HabilleTermine <strong>a-une</strong> Commande</li>
+            <li>HabilleTermine <strong>a-un</strong> Couturier</li>
+        </ul>
+
+        <hr>
+
+        <!-- Classe Personne -->
+        <h2>Classe Personne (abstraite)</h2>
+
+        <h3>Attributs (protected)</h3>
+        <ul>
+            <li><strong>id</strong> : identifiant unique (entier)</li>
+            <li><strong>nom</strong> : nom de la personne (chaine)</li>
+            <li><strong>telephone</strong> : numero de telephone (chaine)</li>
+        </ul>
+
+        <h3>Methodes</h3>
+        <ul>
+            <li><strong>afficher()</strong> : methode virtuelle pure, affiche les infos sur un flux</li>
+            <li><strong>id(), nom(), telephone()</strong> : accesseurs</li>
+            <li><strong>setNom(), setTelephone()</strong> : mutateurs</li>
+        </ul>
+
+        <h3>Operateurs</h3>
+        <ul>
+            <li><strong>&lt;&lt;</strong> : affiche la personne</li>
+            <li><strong>&gt;&gt;</strong> : saisit une personne</li>
+            <li><strong>==, !=</strong> : compare par id</li>
+        </ul>
+
+        <h3>Particularites</h3>
+        <ul>
+            <li>Classe <strong>abstraite</strong> (methode virtuelle pure)</li>
+            <li>Destructeur <strong>virtual</strong></li>
+            <li>Attributs <strong>protected</strong></li>
+        </ul>
+
+        <hr>
+
+        <!-- Classe Client -->
+        <h2>Classe Client</h2>
+
+        <h3>Heritage</h3>
+        <ul>
+            <li>Client <strong>est-une</strong> Personne</li>
+            <li><strong>herite</strong> : id, nom, telephone</li>
+        </ul>
+
+        <h3>Attributs propres (private)</h3>
+        <ul>
+            <li><strong>adresse</strong> : adresse du client (chaine)</li>
+            <li><strong>nombreCommandes</strong> : compteur de commandes (entier)</li>
+        </ul>
+
+        <h3>Methodes</h3>
+        <ul>
+            <li><strong>afficher()</strong> : redefinition avec override</li>
+            <li><strong>adresse(), nombreCommandes()</strong> : accesseurs</li>
+            <li><strong>setAdresse()</strong> : mutateur</li>
+            <li><strong>incrementerCommandes()</strong> : augmente le compteur de 1</li>
+        </ul>
+
+        <h3>Operateurs</h3>
+        <ul>
+            <li><strong>&lt;&lt;</strong> : affiche le client</li>
+            <li><strong>&gt;&gt;</strong> : saisit un client</li>
+        </ul>
+
+        <hr>
+
+        <!-- Classe Couturier -->
+        <h2>Classe Couturier</h2>
+
+        <h3>Heritage</h3>
+        <ul>
+            <li>Couturier <strong>est-une</strong> Personne</li>
+            <li><strong>herite</strong> : id, nom, telephone</li>
+        </ul>
+
+        <h3>Attributs propres (protected)</h3>
+        <ul>
+            <li><strong>specialite</strong> : domaine d'expertise (chaine)</li>
+            <li><strong>tarifHoraire</strong> : prix par heure (reel)</li>
+        </ul>
+
+        <h3>Methodes</h3>
+        <ul>
+            <li><strong>afficher()</strong> : redefinition avec override</li>
+            <li><strong>calculerSalaire(heures)</strong> : methode virtuelle, retourne heures * tarifHoraire</li>
+            <li><strong>specialite(), tarifHoraire()</strong> : accesseurs</li>
+            <li><strong>setSpecialite(), setTarifHoraire()</strong> : mutateurs</li>
+        </ul>
+
+        <h3>Operateurs</h3>
+        <ul>
+            <li><strong>&lt;&lt;</strong> : affiche le couturier</li>
+            <li><strong>&gt;&gt;</strong> : saisit un couturier</li>
+        </ul>
+
+        <h3>Particularites</h3>
+        <ul>
+            <li>Attributs <strong>protected</strong> pour les classes derivees</li>
+            <li><strong>calculerSalaire()</strong> est virtuelle pour permettre la redefinition</li>
+        </ul>
+
+        <hr>
+
+        <!-- Classe CouturierSenior -->
+        <h2>Classe CouturierSenior</h2>
+
+        <h3>Heritage</h3>
+        <ul>
+            <li>CouturierSenior <strong>est-un</strong> Couturier</li>
+            <li><strong>herite</strong> : id, nom, telephone, specialite, tarifHoraire</li>
+        </ul>
+
+        <h3>Attributs propres (private)</h3>
+        <ul>
+            <li><strong>bonus</strong> : bonus mensuel (reel)</li>
+            <li><strong>anneesExperience</strong> : annees d'experience (entier)</li>
+        </ul>
+
+        <h3>Methodes</h3>
+        <ul>
+            <li><strong>afficher()</strong> : redefinition avec override</li>
+            <li><strong>calculerSalaire(heures)</strong> : redefinition avec override, ajoute le bonus au salaire de base</li>
+            <li><strong>bonus(), anneesExperience()</strong> : accesseurs</li>
+            <li><strong>setBonus()</strong> : mutateur</li>
+        </ul>
+
+        <h3>Operateurs</h3>
+        <ul>
+            <li><strong>&lt;&lt;</strong> : affiche le couturier senior</li>
+            <li><strong>&gt;&gt;</strong> : saisit un couturier senior</li>
+        </ul>
+
+        <hr>
+
+        <!-- Classe Apprenti -->
+        <h2>Classe Apprenti</h2>
+
+        <h3>Heritage</h3>
+        <ul>
+            <li>Apprenti <strong>est-un</strong> Couturier</li>
+            <li><strong>herite</strong> : id, nom, telephone, specialite, tarifHoraire</li>
+        </ul>
+
+        <h3>Attributs propres (private)</h3>
+        <ul>
+            <li><strong>mentor</strong> : pointeur vers le couturier mentor</li>
+            <li><strong>dateDebut</strong> : date de debut de l'apprentissage (chaine)</li>
+        </ul>
+
+        <h3>Methodes</h3>
+        <ul>
+            <li><strong>afficher()</strong> : redefinition avec override</li>
+            <li><strong>calculerSalaire(heures)</strong> : redefinition avec override, applique un coefficient reduit (50%)</li>
+            <li><strong>mentor(), dateDebut()</strong> : accesseurs</li>
+            <li><strong>setMentor()</strong> : mutateur</li>
+        </ul>
+
+        <h3>Operateurs</h3>
+        <ul>
+            <li><strong>&lt;&lt;</strong> : affiche l'apprenti</li>
+            <li><strong>&gt;&gt;</strong> : saisit un apprenti</li>
+        </ul>
+
+        <hr>
+
+        <!-- Classe Tissu -->
+        <h2>Classe Tissu</h2>
+
+        <h3>Attributs (private)</h3>
+        <ul>
+            <li><strong>id</strong> : identifiant (entier)</li>
+            <li><strong>nom</strong> : type de tissu (chaine)</li>
+            <li><strong>couleur</strong> : couleur du tissu (chaine)</li>
+            <li><strong>prixAuMetre</strong> : prix par metre (reel)</li>
+            <li><strong>quantiteStock</strong> : metres en stock (reel)</li>
+        </ul>
+
+        <h3>Methodes</h3>
+        <ul>
+            <li><strong>id(), nom(), couleur(), prixAuMetre(), quantiteStock()</strong> : accesseurs</li>
+            <li><strong>setPrixAuMetre()</strong> : mutateur</li>
+            <li><strong>ajouterStock(quantite)</strong> : ajoute au stock</li>
+            <li><strong>retirerStock(quantite)</strong> : retire du stock</li>
+        </ul>
+
+        <h3>Operateurs</h3>
+        <ul>
+            <li><strong>&lt;&lt;</strong> : affiche le tissu</li>
+            <li><strong>&gt;&gt;</strong> : saisit un tissu</li>
+            <li><strong>==, !=</strong> : compare par id</li>
+        </ul>
+
+        <hr>
+
+        <!-- Classe Commande -->
+        <h2>Classe Commande</h2>
+
+        <h3>Attributs (private)</h3>
+        <ul>
+            <li><strong>id</strong> : identifiant (entier)</li>
+            <li><strong>client</strong> : pointeur vers le client</li>
+            <li><strong>tissu</strong> : pointeur vers le tissu</li>
+            <li><strong>metresNecessaires</strong> : quantite de tissu (reel)</li>
+            <li><strong>description</strong> : description de l'habit (chaine)</li>
+            <li><strong>terminee</strong> : etat de la commande (booleen)</li>
+        </ul>
+
+        <h3>Methodes</h3>
+        <ul>
+            <li><strong>id(), client(), tissu(), metresNecessaires(), description(), terminee()</strong> : accesseurs</li>
+            <li><strong>setTerminee()</strong> : marque la commande comme terminee</li>
+            <li><strong>calculerPrix()</strong> : retourne metresNecessaires * prixAuMetre</li>
+        </ul>
+
+        <h3>Operateurs</h3>
+        <ul>
+            <li><strong>&lt;&lt;</strong> : affiche la commande</li>
+            <li><strong>&gt;&gt;</strong> : saisit une commande</li>
+            <li><strong>==</strong> : compare par id</li>
+        </ul>
+
+        <hr>
+
+        <!-- Classe HabilleTermine -->
+        <h2>Classe HabilleTermine (final)</h2>
+
+        <h3>Attributs (private)</h3>
+        <ul>
+            <li><strong>id</strong> : identifiant (entier)</li>
+            <li><strong>commande</strong> : pointeur vers la commande</li>
+            <li><strong>couturier</strong> : pointeur vers le couturier</li>
+            <li><strong>dateTerminaison</strong> : date de fin (chaine)</li>
+            <li><strong>heuresTravail</strong> : heures de travail (entier)</li>
+        </ul>
+
+        <h3>Methodes</h3>
+        <ul>
+            <li><strong>id(), commande(), couturier(), dateTerminaison(), heuresTravail()</strong> : accesseurs</li>
+            <li><strong>calculerCoutTotal()</strong> : retourne prixCommande + salaireCouturier</li>
+        </ul>
+
+        <h3>Operateurs</h3>
+        <ul>
+            <li><strong>&lt;&lt;</strong> : affiche l'habit termine</li>
+        </ul>
+
+        <h3>Particularites</h3>
+        <ul>
+            <li>Classe <strong>final</strong> : ne peut pas etre derivee</li>
+        </ul>
+
+        <hr>
+
+        <!-- Classe Atelier -->
+        <h2>Classe Atelier</h2>
+
+        <h3>Attributs (private)</h3>
+        <ul>
+            <li><strong>nom</strong> : nom de l'atelier (chaine)</li>
+            <li><strong>clients</strong> : liste de clients (vector)</li>
+            <li><strong>couturiers</strong> : liste de pointeurs vers Couturier (pour eviter le slicing)</li>
+            <li><strong>tissus</strong> : liste de tissus (vector)</li>
+            <li><strong>commandes</strong> : liste de commandes (vector)</li>
+            <li><strong>habitsTermines</strong> : liste d'habits termines (vector)</li>
+        </ul>
+
+        <h3>Methodes</h3>
+        <ul>
+            <li><strong>ajouterClient(), trouverClient(), supprimerClient()</strong> : gestion des clients</li>
+            <li><strong>ajouterCouturier(), trouverCouturier()</strong> : gestion des couturiers</li>
+            <li><strong>ajouterTissu(), trouverTissu()</strong> : gestion des tissus</li>
+            <li><strong>ajouterCommande(), trouverCommande()</strong> : gestion des commandes</li>
+            <li><strong>ajouterHabilleTermine()</strong> : ajoute un habit termine</li>
+            <li><strong>afficherTousCouturiers()</strong> : parcourt la liste et appelle afficher() sur chaque couturier</li>
+        </ul>
+
+        <h3>Operateurs</h3>
+        <ul>
+            <li><strong>&lt;&lt;</strong> : affiche l'atelier</li>
+            <li><strong>[]</strong> : retourne un client par son id</li>
+        </ul>
+
+        <hr>
+
+        <!-- Concepts du cours -->
+        <h2>Concepts du cours a utiliser</h2>
+        <table>
+            <tr><th>Concept</th><th>Application</th></tr>
+            <tr><td>Classe abstraite</td><td>Personne avec methode virtuelle pure = 0</td></tr>
+            <tr><td>Heritage simple</td><td>Client et Couturier heritent de Personne</td></tr>
+            <tr><td>Sous-heritage</td><td>CouturierSenior et Apprenti heritent de Couturier</td></tr>
+            <tr><td>override</td><td>afficher() et calculerSalaire() dans les classes derivees</td></tr>
+            <tr><td>Classe final</td><td>HabilleTermine</td></tr>
+            <tr><td>Destructeur virtual</td><td>Dans Personne et Couturier</td></tr>
+            <tr><td>Eviter le slicing</td><td>vector de Couturier* dans Atelier</td></tr>
+            <tr><td>Polymorphisme</td><td>Appel de calculerSalaire() via pointeur de base</td></tr>
+            <tr><td>Surcharge operateurs</td><td>&lt;&lt;, &gt;&gt;, ==, !=, []</td></tr>
+            <tr><td>Encapsulation</td><td>private, protected, accesseurs, mutateurs</td></tr>
+        </table>
+
+        <hr>
+
+        <!-- Conseils main -->
+        <h2>Conseils pour le main</h2>
+        <ol style="margin-left: 25px;">
+            <li>Creer un Atelier</li>
+            <li>Creer un CouturierSenior et un Apprenti</li>
+            <li>Ajouter les couturiers a l'atelier (via pointeurs)</li>
+            <li>Parcourir la liste des couturiers et appeler afficher()</li>
+            <li>Calculer le salaire de chaque couturier (polymorphisme)</li>
+            <li>Ajouter des clients et des tissus</li>
+            <li>Creer des commandes</li>
+            <li>Creer des HabilleTermine</li>
+            <li>Tester les operateurs</li>
+        </ol>
+
+        <hr>
+
+        <!-- Checklist -->
+        <h2>Checklist</h2>
+        <ul>
+            <li>Classe abstraite avec = 0</li>
+            <li>Heritage simple (Personne -> Client, Couturier)</li>
+            <li>Sous-heritage (Couturier -> CouturierSenior, Apprenti)</li>
+            <li>Classe final (HabilleTermine)</li>
+            <li>override sur les redefinitions</li>
+            <li>Destructeur virtual dans les classes de base</li>
+            <li>Vector de pointeurs pour eviter le slicing</li>
+            <li>Polymorphisme avec calculerSalaire()</li>
+            <li>Operateurs &lt;&lt;, &gt;&gt;, ==, !=, []</li>
+            <li>Listes d'initialisation</li>
+            <li>Attributs protected pour l'heritage</li>
+        </ul>
+
+    </div>
+</body>
+</html>

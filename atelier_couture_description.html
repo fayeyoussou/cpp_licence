@@ -252,14 +252,13 @@ Personne (abstraite)
         <h3>Attributs propres (private)</h3>
         <ul>
             <li><strong>mentor</strong> : pointeur vers le couturier mentor</li>
-            <li><strong>dateDebut</strong> : date de debut de l'apprentissage (chaine)</li>
         </ul>
 
         <h3>Methodes</h3>
         <ul>
             <li><strong>afficher()</strong> : redefinition avec override</li>
             <li><strong>calculerSalaire(heures)</strong> : redefinition avec override, applique un coefficient reduit (50%)</li>
-            <li><strong>mentor(), dateDebut()</strong> : accesseurs</li>
+            <li><strong>mentor()</strong> : accesseur</li>
             <li><strong>setMentor()</strong> : mutateur</li>
         </ul>
 
@@ -337,13 +336,12 @@ Personne (abstraite)
             <li><strong>id</strong> : identifiant (entier)</li>
             <li><strong>commande</strong> : pointeur vers la commande</li>
             <li><strong>couturier</strong> : pointeur vers le couturier</li>
-            <li><strong>dateTerminaison</strong> : date de fin (chaine)</li>
             <li><strong>heuresTravail</strong> : heures de travail (entier)</li>
         </ul>
 
         <h3>Methodes</h3>
         <ul>
-            <li><strong>id(), commande(), couturier(), dateTerminaison(), heuresTravail()</strong> : accesseurs</li>
+            <li><strong>id(), commande(), couturier(), heuresTravail()</strong> : accesseurs</li>
             <li><strong>calculerCoutTotal()</strong> : retourne prixCommande + salaireCouturier</li>
         </ul>
 
@@ -390,54 +388,63 @@ Personne (abstraite)
 
         <hr>
 
-        <!-- Concepts du cours -->
-        <h2>Concepts du cours a utiliser</h2>
-        <table>
-            <tr><th>Concept</th><th>Application</th></tr>
-            <tr><td>Classe abstraite</td><td>Personne avec methode virtuelle pure = 0</td></tr>
-            <tr><td>Heritage simple</td><td>Client et Couturier heritent de Personne</td></tr>
-            <tr><td>Sous-heritage</td><td>CouturierSenior et Apprenti heritent de Couturier</td></tr>
-            <tr><td>override</td><td>afficher() et calculerSalaire() dans les classes derivees</td></tr>
-            <tr><td>Classe final</td><td>HabilleTermine</td></tr>
-            <tr><td>Destructeur virtual</td><td>Dans Personne et Couturier</td></tr>
-            <tr><td>Eviter le slicing</td><td>vector de Couturier* dans Atelier</td></tr>
-            <tr><td>Polymorphisme</td><td>Appel de calculerSalaire() via pointeur de base</td></tr>
-            <tr><td>Surcharge operateurs</td><td>&lt;&lt;, &gt;&gt;, ==, !=, []</td></tr>
-            <tr><td>Encapsulation</td><td>private, protected, accesseurs, mutateurs</td></tr>
-        </table>
+        <!-- Scenario du main -->
+        <h2>Scenario du main</h2>
 
-        <hr>
-
-        <!-- Conseils main -->
-        <h2>Conseils pour le main</h2>
-        <ol style="margin-left: 25px;">
-            <li>Creer un Atelier</li>
-            <li>Creer un CouturierSenior et un Apprenti</li>
-            <li>Ajouter les couturiers a l'atelier (via pointeurs)</li>
-            <li>Parcourir la liste des couturiers et appeler afficher()</li>
-            <li>Calculer le salaire de chaque couturier (polymorphisme)</li>
-            <li>Ajouter des clients et des tissus</li>
-            <li>Creer des commandes</li>
-            <li>Creer des HabilleTermine</li>
-            <li>Tester les operateurs</li>
-        </ol>
-
-        <hr>
-
-        <!-- Checklist -->
-        <h2>Checklist</h2>
+        <h3>1. Initialisation de l'atelier</h3>
         <ul>
-            <li>Classe abstraite avec = 0</li>
-            <li>Heritage simple (Personne -> Client, Couturier)</li>
-            <li>Sous-heritage (Couturier -> CouturierSenior, Apprenti)</li>
-            <li>Classe final (HabilleTermine)</li>
-            <li>override sur les redefinitions</li>
-            <li>Destructeur virtual dans les classes de base</li>
-            <li>Vector de pointeurs pour eviter le slicing</li>
-            <li>Polymorphisme avec calculerSalaire()</li>
-            <li>Operateurs &lt;&lt;, &gt;&gt;, ==, !=, []</li>
-            <li>Listes d'initialisation</li>
-            <li>Attributs protected pour l'heritage</li>
+            <li>Creer un atelier avec un nom</li>
+            <li>Afficher l'atelier avec &lt;&lt;</li>
+        </ul>
+
+        <h3>2. Gestion des tissus</h3>
+        <ul>
+            <li>Creer 2 tissus en dur dans le code</li>
+            <li>Ajouter les tissus a l'atelier</li>
+            <li>Afficher chaque tissu avec &lt;&lt;</li>
+        </ul>
+
+        <h3>3. Gestion des couturiers (eviter le slicing)</h3>
+        <ul>
+            <li>Creer un CouturierSenior en dur</li>
+            <li>Creer un Apprenti en dur (le mentor est le CouturierSenior)</li>
+            <li>Ajouter les deux a l'atelier</li>
+            <li>Parcourir la liste des couturiers et appeler afficher() sur chacun</li>
+            <li>Calculer et afficher le salaire de chaque couturier pour 10 heures de travail</li>
+        </ul>
+
+        <h3>4. Saisie d'un client</h3>
+        <ul>
+            <li>Demander a l'utilisateur de saisir un client avec &gt;&gt;</li>
+            <li>Ajouter le client a l'atelier</li>
+            <li>Afficher le client avec &lt;&lt;</li>
+            <li>Acceder au client avec l'operateur [] et l'afficher</li>
+        </ul>
+
+        <h3>5. Creation d'une commande</h3>
+        <ul>
+            <li>Demander a l'utilisateur de choisir un tissu (afficher les tissus disponibles)</li>
+            <li>Demander la quantite de metres et la description de l'habit</li>
+            <li>Creer la commande avec le client saisi et le tissu choisi</li>
+            <li>Afficher le prix de la commande</li>
+            <li>Ajouter la commande a l'atelier</li>
+        </ul>
+
+        <h3>6. Terminer une commande</h3>
+        <ul>
+            <li>Afficher les couturiers disponibles</li>
+            <li>Demander a l'utilisateur de choisir un couturier</li>
+            <li>Demander le nombre d'heures de travail</li>
+            <li>Marquer la commande comme terminee</li>
+            <li>Creer un HabilleTermine avec la commande et le couturier</li>
+            <li>Afficher le cout total de l'habit termine</li>
+        </ul>
+
+        <h3>7. Tests des operateurs</h3>
+        <ul>
+            <li>Comparer deux tissus avec ==</li>
+            <li>Comparer deux clients avec != </li>
+            <li>Afficher l'atelier complet avec &lt;&lt;</li>
         </ul>
 
     </div>

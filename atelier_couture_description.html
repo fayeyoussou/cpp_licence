@@ -115,14 +115,23 @@ Personne (abstraite)
         <ul>
             <li><strong>id</strong> : identifiant unique (entier)</li>
             <li><strong>nom</strong> : nom de la personne (chaine)</li>
+            <li><strong>prenom</strong> : prenom de la personne (chaine)</li>
             <li><strong>telephone</strong> : numero de telephone (chaine)</li>
+        </ul>
+
+        <h3>Controles</h3>
+        <ul>
+            <li><strong>id</strong> : doit etre > 0</li>
+            <li><strong>nom</strong> : ne doit pas etre vide</li>
+            <li><strong>prenom</strong> : ne doit pas etre vide</li>
+            <li><strong>telephone</strong> : ne doit pas etre vide</li>
         </ul>
 
         <h3>Methodes</h3>
         <ul>
             <li><strong>afficher()</strong> : methode virtuelle pure, affiche les infos sur un flux</li>
-            <li><strong>id(), nom(), telephone()</strong> : accesseurs</li>
-            <li><strong>setNom(), setTelephone()</strong> : mutateurs</li>
+            <li><strong>id(), nom(), prenom(), telephone()</strong> : accesseurs</li>
+            <li><strong>setNom(), setPrenom(), setTelephone()</strong> : mutateurs (lancent une erreur si valeur invalide)</li>
         </ul>
 
         <h3>Operateurs</h3>
@@ -147,7 +156,7 @@ Personne (abstraite)
         <h3>Heritage</h3>
         <ul>
             <li>Client <strong>est-une</strong> Personne</li>
-            <li><strong>herite</strong> : id, nom, telephone</li>
+            <li><strong>herite</strong> : id, nom, prenom, telephone</li>
         </ul>
 
         <h3>Attributs propres (private)</h3>
@@ -156,11 +165,16 @@ Personne (abstraite)
             <li><strong>nombreCommandes</strong> : compteur de commandes (entier)</li>
         </ul>
 
+        <h3>Controles</h3>
+        <ul>
+            <li><strong>adresse</strong> : ne doit pas etre vide</li>
+        </ul>
+
         <h3>Methodes</h3>
         <ul>
             <li><strong>afficher()</strong> : redefinition avec override</li>
             <li><strong>adresse(), nombreCommandes()</strong> : accesseurs</li>
-            <li><strong>setAdresse()</strong> : mutateur</li>
+            <li><strong>setAdresse()</strong> : mutateur (lance une erreur si vide)</li>
             <li><strong>incrementerCommandes()</strong> : augmente le compteur de 1</li>
         </ul>
 
@@ -178,7 +192,7 @@ Personne (abstraite)
         <h3>Heritage</h3>
         <ul>
             <li>Couturier <strong>est-une</strong> Personne</li>
-            <li><strong>herite</strong> : id, nom, telephone</li>
+            <li><strong>herite</strong> : id, nom, prenom, telephone</li>
         </ul>
 
         <h3>Attributs propres (protected)</h3>
@@ -187,12 +201,18 @@ Personne (abstraite)
             <li><strong>tarifHoraire</strong> : prix par heure (reel)</li>
         </ul>
 
+        <h3>Controles</h3>
+        <ul>
+            <li><strong>specialite</strong> : ne doit pas etre vide</li>
+            <li><strong>tarifHoraire</strong> : doit etre > 0</li>
+        </ul>
+
         <h3>Methodes</h3>
         <ul>
             <li><strong>afficher()</strong> : redefinition avec override</li>
             <li><strong>calculerSalaire(heures)</strong> : methode virtuelle, retourne heures * tarifHoraire</li>
             <li><strong>specialite(), tarifHoraire()</strong> : accesseurs</li>
-            <li><strong>setSpecialite(), setTarifHoraire()</strong> : mutateurs</li>
+            <li><strong>setSpecialite(), setTarifHoraire()</strong> : mutateurs (lancent une erreur si valeur invalide)</li>
         </ul>
 
         <h3>Operateurs</h3>
@@ -215,7 +235,7 @@ Personne (abstraite)
         <h3>Heritage</h3>
         <ul>
             <li>CouturierSenior <strong>est-un</strong> Couturier</li>
-            <li><strong>herite</strong> : id, nom, telephone, specialite, tarifHoraire</li>
+            <li><strong>herite</strong> : id, nom, prenom, telephone, specialite, tarifHoraire</li>
         </ul>
 
         <h3>Attributs propres (private)</h3>
@@ -224,12 +244,18 @@ Personne (abstraite)
             <li><strong>anneesExperience</strong> : annees d'experience (entier)</li>
         </ul>
 
+        <h3>Controles</h3>
+        <ul>
+            <li><strong>bonus</strong> : doit etre >= 0</li>
+            <li><strong>anneesExperience</strong> : doit etre >= 0</li>
+        </ul>
+
         <h3>Methodes</h3>
         <ul>
             <li><strong>afficher()</strong> : redefinition avec override</li>
             <li><strong>calculerSalaire(heures)</strong> : redefinition avec override, ajoute le bonus au salaire de base</li>
             <li><strong>bonus(), anneesExperience()</strong> : accesseurs</li>
-            <li><strong>setBonus()</strong> : mutateur</li>
+            <li><strong>setBonus()</strong> : mutateur (lance une erreur si < 0)</li>
         </ul>
 
         <h3>Operateurs</h3>
@@ -246,7 +272,7 @@ Personne (abstraite)
         <h3>Heritage</h3>
         <ul>
             <li>Apprenti <strong>est-un</strong> Couturier</li>
-            <li><strong>herite</strong> : id, nom, telephone, specialite, tarifHoraire</li>
+            <li><strong>herite</strong> : id, nom, prenom, telephone, specialite, tarifHoraire</li>
         </ul>
 
         <h3>Attributs propres (private)</h3>
@@ -254,12 +280,17 @@ Personne (abstraite)
             <li><strong>mentor</strong> : pointeur vers le couturier mentor</li>
         </ul>
 
+        <h3>Controles</h3>
+        <ul>
+            <li><strong>mentor</strong> : ne doit pas etre nullptr</li>
+        </ul>
+
         <h3>Methodes</h3>
         <ul>
             <li><strong>afficher()</strong> : redefinition avec override</li>
             <li><strong>calculerSalaire(heures)</strong> : redefinition avec override, applique un coefficient reduit (50%)</li>
             <li><strong>mentor()</strong> : accesseur</li>
-            <li><strong>setMentor()</strong> : mutateur</li>
+            <li><strong>setMentor()</strong> : mutateur (lance une erreur si nullptr)</li>
         </ul>
 
         <h3>Operateurs</h3>
@@ -282,12 +313,21 @@ Personne (abstraite)
             <li><strong>quantiteStock</strong> : metres en stock (reel)</li>
         </ul>
 
+        <h3>Controles</h3>
+        <ul>
+            <li><strong>id</strong> : doit etre > 0</li>
+            <li><strong>nom</strong> : ne doit pas etre vide</li>
+            <li><strong>couleur</strong> : ne doit pas etre vide</li>
+            <li><strong>prixAuMetre</strong> : doit etre > 0</li>
+            <li><strong>quantiteStock</strong> : doit etre >= 0</li>
+        </ul>
+
         <h3>Methodes</h3>
         <ul>
             <li><strong>id(), nom(), couleur(), prixAuMetre(), quantiteStock()</strong> : accesseurs</li>
-            <li><strong>setPrixAuMetre()</strong> : mutateur</li>
-            <li><strong>ajouterStock(quantite)</strong> : ajoute au stock</li>
-            <li><strong>retirerStock(quantite)</strong> : retire du stock</li>
+            <li><strong>setPrixAuMetre()</strong> : mutateur (lance une erreur si <= 0)</li>
+            <li><strong>ajouterStock(quantite)</strong> : ajoute au stock (lance une erreur si quantite < 0)</li>
+            <li><strong>retirerStock(quantite)</strong> : retire du stock (lance une erreur si stock insuffisant)</li>
         </ul>
 
         <h3>Operateurs</h3>
@@ -295,6 +335,8 @@ Personne (abstraite)
             <li><strong>&lt;&lt;</strong> : affiche le tissu</li>
             <li><strong>&gt;&gt;</strong> : saisit un tissu</li>
             <li><strong>==, !=</strong> : compare par id</li>
+            <li><strong>+=</strong> : ajoute une quantite au stock</li>
+            <li><strong>-=</strong> : retire une quantite du stock (lance une erreur si stock insuffisant)</li>
         </ul>
 
         <hr>
@@ -310,6 +352,15 @@ Personne (abstraite)
             <li><strong>metresNecessaires</strong> : quantite de tissu (reel)</li>
             <li><strong>description</strong> : description de l'habit (chaine)</li>
             <li><strong>terminee</strong> : etat de la commande (booleen)</li>
+        </ul>
+
+        <h3>Controles</h3>
+        <ul>
+            <li><strong>id</strong> : doit etre > 0</li>
+            <li><strong>client</strong> : ne doit pas etre nullptr</li>
+            <li><strong>tissu</strong> : ne doit pas etre nullptr</li>
+            <li><strong>metresNecessaires</strong> : doit etre > 0</li>
+            <li><strong>description</strong> : ne doit pas etre vide</li>
         </ul>
 
         <h3>Methodes</h3>
@@ -337,6 +388,14 @@ Personne (abstraite)
             <li><strong>commande</strong> : pointeur vers la commande</li>
             <li><strong>couturier</strong> : pointeur vers le couturier</li>
             <li><strong>heuresTravail</strong> : heures de travail (entier)</li>
+        </ul>
+
+        <h3>Controles</h3>
+        <ul>
+            <li><strong>id</strong> : doit etre > 0</li>
+            <li><strong>commande</strong> : ne doit pas etre nullptr</li>
+            <li><strong>couturier</strong> : ne doit pas etre nullptr</li>
+            <li><strong>heuresTravail</strong> : doit etre > 0</li>
         </ul>
 
         <h3>Methodes</h3>
